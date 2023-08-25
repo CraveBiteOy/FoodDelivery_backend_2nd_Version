@@ -17,6 +17,7 @@ import com.cravebite.backend_2.dtos.RegisterDto;
 import com.cravebite.backend_2.models.User;
 import com.cravebite.backend_2.service.CustomUserDetailService;
 import com.cravebite.backend_2.service.TestService;
+import com.cravebite.backend_2.utils.JWTUtils;
 
 import jakarta.validation.Valid;
 
@@ -29,6 +30,9 @@ public class TestController {
 
     @Autowired
     private CustomUserDetailService customUserDetailService;
+
+    @Autowired
+    private JWTUtils jwtUtil;
 
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
@@ -50,6 +54,18 @@ public class TestController {
     public ResponseEntity<UserDetails> loadUserByUsername(@PathVariable String username) {
         UserDetails userDetails = customUserDetailService.loadUserByUsername(username);
         return new ResponseEntity<>(userDetails, HttpStatus.OK);
+    }
+
+    @GetMapping("/generate-token")
+    public String generateToken() {
+        UserDetails userDetails = customUserDetailService.loadUserByUsername("admin");
+        return jwtUtil.generateToken(userDetails);
+    }
+
+    @GetMapping("/validate-token/{token}")
+    public Boolean validateToken(@PathVariable String token) {
+        UserDetails userDetails = customUserDetailService.loadUserByUsername("admin");
+        return jwtUtil.validateToken(token, userDetails);
     }
 
 }
