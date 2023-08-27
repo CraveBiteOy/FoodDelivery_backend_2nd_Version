@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cravebite.backend_2.dtos.LoginDto;
 import com.cravebite.backend_2.dtos.RegisterDto;
 import com.cravebite.backend_2.models.User;
+import com.cravebite.backend_2.service.AuthService;
 import com.cravebite.backend_2.service.CustomUserDetailService;
 import com.cravebite.backend_2.service.TestService;
 import com.cravebite.backend_2.utils.JWTUtils;
@@ -33,6 +35,9 @@ public class TestController {
 
     @Autowired
     private JWTUtils jwtUtil;
+
+    @Autowired
+    private AuthService authService;
 
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
@@ -66,6 +71,18 @@ public class TestController {
     public Boolean validateToken(@PathVariable String token) {
         UserDetails userDetails = customUserDetailService.loadUserByUsername("admin");
         return jwtUtil.validateToken(token, userDetails);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<User> register(@RequestBody RegisterDto registerDto) {
+        User registeredUser = authService.registerUser(registerDto);
+        return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
+        String token = authService.loginUser(loginDto);
+        return new ResponseEntity<>("JWT Token: " + token, HttpStatus.OK);
     }
 
 }
