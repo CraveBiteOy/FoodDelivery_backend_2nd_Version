@@ -85,4 +85,9 @@ public class TestController {
         return new ResponseEntity<>("JWT Token: " + token, HttpStatus.OK);
     }
 
+    @GetMapping("/secure-endpoint")
+    public ResponseEntity<String> secureEndpoint() {
+        return new ResponseEntity<>("This is a secure endpoint", HttpStatus.OK);
+    }
+
 }

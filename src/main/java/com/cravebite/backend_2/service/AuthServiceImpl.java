@@ -31,7 +31,7 @@ public class AuthServiceImpl implements AuthService {
     private JWTUtils jwtUtils;
 
     @Autowired
-    private CustomUserDetailService customUserDetailService; // Add this line
+    private CustomUserDetailService customUserDetailService;
 
     @Override
     public User registerUser(RegisterDto registerDto) {
@@ -53,10 +53,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String loginUser(LoginDto loginDto) {
-        UserDetails userDetails = customUserDetailService.loadUserByUsername(loginDto.getUsername()); // Use
-                                                                                                      // CustomUserDetailService
-                                                                                                      // here
-
+        UserDetails userDetails = customUserDetailService.loadUserByUsername(loginDto.getUsername());
         if (!passwordEncoder.matches(loginDto.getPassword(), userDetails.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
