@@ -2,10 +2,6 @@ package com.cravebite.backend_2.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * temporarily disabling security for testing purposes
- */
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,9 +33,9 @@ public class SecurityConfig {
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/test/**").permitAll()
+                        // .requestMatchers("/test/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/user/**").permitAll()
+                        // .requestMatchers("/user/**").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint))

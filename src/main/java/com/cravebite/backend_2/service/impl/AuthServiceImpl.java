@@ -3,6 +3,7 @@ package com.cravebite.backend_2.service.impl;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.cravebite.backend_2.dtos.LoginDto;
 import com.cravebite.backend_2.dtos.RegisterDto;
+import com.cravebite.backend_2.exception.APIException;
 import com.cravebite.backend_2.models.Role;
 import com.cravebite.backend_2.models.User;
 import com.cravebite.backend_2.models.response.LoginResponse;
@@ -22,6 +24,8 @@ import com.cravebite.backend_2.repository.UserRepository;
 import com.cravebite.backend_2.service.AuthService;
 import com.cravebite.backend_2.service.CustomUserDetailService;
 import com.cravebite.backend_2.utils.JWTUtils;
+
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -44,10 +48,23 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private CustomUserDetailService customUserDetailService;
 
+    @PostConstruct
+    public void init() {
+        if (roleRepository.count() == 0) {
+            Role admin = new Role();
+            admin.setName("ROLE_ADMIN");
+            roleRepository.save(admin);
+
+            Role user = new Role();
+            user.setName("ROLE_USER");
+            roleRepository.save(user);
+        }
+    }
+
     @Override
     public SignupResponse registerUser(RegisterDto registerDto) {
         if (userRepository.findByUsername(registerDto.getUsername()).isPresent()) {
-            throw new RuntimeException("User already exists");
+            throw new APIException(HttpStatus.CONFLICT, "A user with this username already exists");
         }
 
         User newUser = new User();
@@ -56,7 +73,7 @@ public class AuthServiceImpl implements AuthService {
 
         // Assign default role to new user
         Role userRole = roleRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                .orElseThrow(() -> new APIException(HttpStatus.NOT_FOUND, "Role is not found."));
         newUser.setRoles(Set.of(userRole));
 
         userRepository.save(newUser);
@@ -65,20 +82,6 @@ public class AuthServiceImpl implements AuthService {
                 .message("User registered successfully")
                 .build();
     }
-
-    // @Override
-    // public LoginResponse loginUser(LoginDto loginDto) {
-    // UserDetails userDetails =
-    // customUserDetailService.loadUserByUsername(loginDto.getUsername());
-    // if (!passwordEncoder.matches(loginDto.getPassword(),
-    // userDetails.getPassword())) {
-    // throw new RuntimeException("Invalid credentials");
-    // }
-    // return jwtUtils.generateToken(userDetails);
-    // return LoginResponse.builder()
-    // .accessToken(jwtUtils.generateToken(userDetails))
-    // .build();
-    // }
 
     @Override
     public LoginResponse loginUser(LoginDto loginDto) {
