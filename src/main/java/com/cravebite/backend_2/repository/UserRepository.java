@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.cravebite.backend_2.models.User;
+import com.cravebite.backend_2.models.entities.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 

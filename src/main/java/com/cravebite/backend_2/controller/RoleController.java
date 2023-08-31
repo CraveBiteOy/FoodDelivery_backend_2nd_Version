@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.cravebite.backend_2.models.Role;
+import com.cravebite.backend_2.models.entities.Role;
 import com.cravebite.backend_2.service.RoleService;
 
 import lombok.AllArgsConstructor;

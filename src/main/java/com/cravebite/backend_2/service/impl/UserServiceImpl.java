@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.cravebite.backend_2.models.User;
+import com.cravebite.backend_2.models.entities.User;
 import com.cravebite.backend_2.repository.UserRepository;
 import com.cravebite.backend_2.service.UserService;
 
@@ -25,6 +25,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public User getUserbyUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Error: User is not found."));
     }
 
 }

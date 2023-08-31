@@ -11,7 +11,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import com.cravebite.backend_2.models.User;
+
+import com.cravebite.backend_2.models.entities.User;
 import com.cravebite.backend_2.repository.UserRepository;
 
 @Service

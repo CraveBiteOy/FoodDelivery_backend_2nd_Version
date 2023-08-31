@@ -1,4 +1,4 @@
-package com.cravebite.backend_2.models;
+package com.cravebite.backend_2.models.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

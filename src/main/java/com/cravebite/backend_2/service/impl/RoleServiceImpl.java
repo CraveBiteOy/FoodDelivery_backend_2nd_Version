@@ -3,7 +3,7 @@ package com.cravebite.backend_2.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.cravebite.backend_2.models.Role;
+import com.cravebite.backend_2.models.entities.Role;
 import com.cravebite.backend_2.repository.RoleRepository;
 import com.cravebite.backend_2.service.RoleService;
 
