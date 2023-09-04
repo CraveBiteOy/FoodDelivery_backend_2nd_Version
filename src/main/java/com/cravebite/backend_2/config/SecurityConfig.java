@@ -21,40 +21,40 @@ import com.cravebite.backend_2.security.JwtRequestFilter;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private JwtRequestFilter jwtRequestFilter;
+        @Autowired
+        private JwtRequestFilter jwtRequestFilter;
 
-    @Autowired
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+        @Autowired
+        private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        // .requestMatchers("/test/**").permitAll()
-                        .requestMatchers("/auth/**").permitAll()
-                        // .requestMatchers("/user/**").permitAll()
-                        .anyRequest().authenticated())
-                .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .authenticationEntryPoint(jwtAuthenticationEntryPoint))
-                .sessionManagement(
-                        sessionManagement -> sessionManagement
-                                .sessionCreationPolicy(
-                                        SessionCreationPolicy.STATELESS));
-        return http.build();
-    }
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+                http
+                                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                                .csrf(csrf -> csrf.disable())
+                                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                                                .requestMatchers("/test/**").permitAll()
+                                                .requestMatchers("/auth/**").permitAll()
+                                                // .requestMatchers("/user/**").permitAll()
+                                                .anyRequest().authenticated())
+                                .exceptionHandling(exceptionHandling -> exceptionHandling
+                                                .authenticationEntryPoint(jwtAuthenticationEntryPoint))
+                                .sessionManagement(
+                                                sessionManagement -> sessionManagement
+                                                                .sessionCreationPolicy(
+                                                                                SessionCreationPolicy.STATELESS));
+                return http.build();
+        }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
-            throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
+        @Bean
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+                        throws Exception {
+                return authenticationConfiguration.getAuthenticationManager();
+        }
 
 }
