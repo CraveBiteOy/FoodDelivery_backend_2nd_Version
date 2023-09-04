@@ -25,7 +25,10 @@ public class User {
     private String password;
 
     private String firstname;
-    private String lastname;
+    private String surename;
+
+    private Double longitude;
+    private Double latitude;
 
     @OneToOne(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "customer_id", referencedColumnName = "id")

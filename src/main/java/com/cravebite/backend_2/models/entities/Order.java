@@ -23,8 +23,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "orders")
+@Entity(name = "orders")
+@Table()
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -56,15 +56,18 @@ public class Order {
 
     @Min(value = 0, message = "pickup time must be greater than 0")
     @Column(name = "pickup_time")
-    private String pickupTime;
+    // private String pickupTime;
+    private Integer pickupTime;
 
     @Min(value = 0, message = "dropoff time must be greater than 0")
     @Column(name = "dropoff_time")
-    private String dropoffTime;
+    // private String dropoffTime;
+    private Integer dropoffTime;
 
     @Min(value = 0, message = "delivery total time must be greater than 0")
     @Column(name = "delivery_total_time")
-    private String deliveryTotalTime;
+    // private String deliveryTotalTime;
+    private Integer deliveryTotalTime;
 
     @Column(name = "courier_start_latitude")
     private Double courierStartLatitude;

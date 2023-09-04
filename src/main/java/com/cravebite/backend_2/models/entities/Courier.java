@@ -4,12 +4,12 @@ import com.cravebite.backend_2.models.enums.CourierStatus;
 import com.cravebite.backend_2.models.enums.NavigationMode;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -31,8 +31,8 @@ public class Courier {
     private boolean availability;
     private NavigationMode mode;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private CourierLocation location;
+    @Column(name = "location_id")
+    private Long locationId;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private User user;

@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cravebite.backend_2.dtos.LoginDto;
-import com.cravebite.backend_2.dtos.RegisterDto;
+import com.cravebite.backend_2.models.request.LoginRequestDTO;
+import com.cravebite.backend_2.models.request.RegisterRequestDTO;
 import com.cravebite.backend_2.models.response.LoginResponse;
 import com.cravebite.backend_2.models.response.SignupResponse;
 import com.cravebite.backend_2.service.AuthService;
@@ -26,13 +26,14 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginDto loginDto) throws Exception {
-        return ResponseEntity.ok(authService.loginUser(loginDto));
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequestDTO loginResquestDTO) throws Exception {
+        return ResponseEntity.ok(authService.loginUser(loginResquestDTO));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<SignupResponse> register(@Valid @RequestBody RegisterDto registerDto) throws Exception {
-        return new ResponseEntity<>(authService.registerUser(registerDto), HttpStatus.CREATED);
+    public ResponseEntity<SignupResponse> register(@Valid @RequestBody RegisterRequestDTO registerRequestDTO)
+            throws Exception {
+        return new ResponseEntity<>(authService.registerUser(registerRequestDTO), HttpStatus.CREATED);
     }
 
 }

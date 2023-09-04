@@ -12,11 +12,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.cravebite.backend_2.dtos.LoginDto;
-import com.cravebite.backend_2.dtos.RegisterDto;
 import com.cravebite.backend_2.exception.APIException;
 import com.cravebite.backend_2.models.entities.Role;
 import com.cravebite.backend_2.models.entities.User;
+import com.cravebite.backend_2.models.request.LoginRequestDTO;
+import com.cravebite.backend_2.models.request.RegisterRequestDTO;
 import com.cravebite.backend_2.models.response.LoginResponse;
 import com.cravebite.backend_2.models.response.SignupResponse;
 import com.cravebite.backend_2.repository.RoleRepository;
@@ -62,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public SignupResponse registerUser(RegisterDto registerDto) {
+    public SignupResponse registerUser(RegisterRequestDTO registerDto) {
         if (userRepository.findByUsername(registerDto.getUsername()).isPresent()) {
             throw new APIException(HttpStatus.CONFLICT, "A user with this username already exists");
         }
@@ -84,7 +84,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponse loginUser(LoginDto loginDto) {
+    public LoginResponse loginUser(LoginRequestDTO loginDto) {
         Authentication auth = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
 
