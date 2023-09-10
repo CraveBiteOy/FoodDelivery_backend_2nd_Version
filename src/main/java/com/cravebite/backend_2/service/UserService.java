@@ -12,4 +12,6 @@ public interface UserService {
 
     User getUserbyUsername(String username);
 
+    User getAuthenticatedUser();
+
 }

@@ -19,7 +19,7 @@ public class BasketRequestDTO {
     @NotNull(message = "restaurantId cannot be null")
     private Long restaurantId;
 
-    @NotEmpty(message = "Menu Item IDs cannot be empty")
-    private List<Long> menuItemIds;
+    @NotEmpty(message = "Basket items cannot be empty")
+    private List<BasketItemRequestDTO> basketItems;
 
 }

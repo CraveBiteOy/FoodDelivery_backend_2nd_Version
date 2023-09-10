@@ -1,6 +1,7 @@
 package com.cravebite.backend_2.models.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,15 +17,15 @@ public class RegisterRequestDTO {
     @NotBlank(message = "password cannot be blank")
     private String password;
 
-    @NotBlank(message = "email cannot be blank")
+    @NotBlank(message = "firstname cannot be blank")
     private String firstname;
 
-    @NotBlank(message = "email cannot be blank")
+    @NotBlank(message = "surename cannot be blank")
     private String surename;
 
-    @NotBlank(message = "email cannot be blank")
+    @NotNull(message = "longitude cannot be null")
     private double longitude;
 
-    @NotBlank(message = "email cannot be blank")
+    @NotNull(message = "latitude cannot be null")
     private double latitude;
 }

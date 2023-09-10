@@ -11,4 +11,5 @@ public class BasketItemResponseDTO {
     private Long id;
     private int quantity;
     private MenuItemResponseDTO menuItem;
+    // private Double totalPrice;
 }

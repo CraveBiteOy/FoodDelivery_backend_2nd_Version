@@ -95,4 +95,5 @@ public class AuthServiceImpl implements AuthService {
                 .accessToken(jwtUtils.generateToken(userDetails))
                 .build();
     }
+
 }
