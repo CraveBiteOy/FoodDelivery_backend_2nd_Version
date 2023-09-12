@@ -32,28 +32,53 @@ public class DataGenerator {
         public void generateData() {
 
                 // Create users
-                User user1 = createUser("johnsmith", "password");
-                User user2 = createUser("me", "password");
+                User user1 = createUser("john", "password");
+                User user2 = createUser("prince", "password");
+                User user3 = createUser("jade", "password");
 
                 userRepository.save(user1);
                 userRepository.save(user2);
+                userRepository.save(user3);
 
                 // Create a new RestaurantOwner and persist
-                RestaurantOwner restaurantOwner = new RestaurantOwner();
-                restaurantOwner.setUser(user1);
-                restaurantOwnerRepository.save(restaurantOwner);
+                RestaurantOwner restaurantOwner1 = new RestaurantOwner();
+                restaurantOwner1.setUser(user1);
+                restaurantOwnerRepository.save(restaurantOwner1);
 
-                // Create a new Restaurant and persist
-                Restaurant restaurant1 = createRestaurant("John's Pizza", "123 Main St", "12345", "Anytown", 40.7128,
+                RestaurantOwner restaurantOwner2 = new RestaurantOwner();
+                restaurantOwner2.setUser(user2);
+                restaurantOwnerRepository.save(restaurantOwner2);
+
+                RestaurantOwner restaurantOwner3 = new RestaurantOwner();
+                restaurantOwner3.setUser(user3);
+                restaurantOwnerRepository.save(restaurantOwner3);
+
+                // Create restaurants for onwer1
+                Restaurant restaurant1 = createRestaurant("John's Pizza", "123 Main St", "1845", "Anytown", 40.7128,
                                 74.0060,
-                                restaurantOwner);
+                                restaurantOwner1);
                 restaurantRepository.save(restaurant1);
 
-                // different restaurant
                 Restaurant restaurant2 = createRestaurant("Leon's Pizza", "223 Main St", "2222", "Anytown", 41.7128,
                                 71.0060,
-                                restaurantOwner);
+                                restaurantOwner1);
                 restaurantRepository.save(restaurant2);
+
+                // create restaurants for onwer2
+                Restaurant restaurant3 = createRestaurant("shu", "773 Main St", "12345", "Anytown", 40.7128,
+                                74.0060,
+                                restaurantOwner2);
+                restaurantRepository.save(restaurant3);
+
+                Restaurant restaurant4 = createRestaurant("legend", "333 Main St", "2662", "Anytown", 41.7128,
+                                71.0060,
+                                restaurantOwner2);
+                restaurantRepository.save(restaurant4);
+
+                Restaurant restaurant5 = createRestaurant("sannamaria", "111 Main St", "2112", "Anytown", 41.7128,
+                                71.0060,
+                                restaurantOwner2);
+                restaurantRepository.save(restaurant5);
 
                 // Create a new MenuItem and persist for restaurant1
                 MenuItem menuItem1 = createMenuItem("Pepperoni Pizza", "Delicious pizza with pepperoni and cheese",

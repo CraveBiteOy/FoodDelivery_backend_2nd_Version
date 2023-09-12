@@ -11,9 +11,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class RestaurantRequestDTO {
 
-    @NotNull(message = "ownerId cannot be null")
-    private Long ownerId;
-
     @NotBlank(message = "name cannot be blank")
     private String name;
 
@@ -26,9 +23,10 @@ public class RestaurantRequestDTO {
     @NotBlank(message = "city cannot be blank")
     private String city;
 
-    @NotBlank(message = "country cannot be blank")
+    @NotNull(message = "latitude cannot be null")
     private Double latitude;
 
-    @NotBlank(message = "country cannot be blank")
+    @NotNull(message = "longitude cannot be null")
     private Double longitude;
+
 }

@@ -4,16 +4,18 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.cravebite.backend_2.models.entities.RestaurantOwner;
 import com.cravebite.backend_2.models.entities.User;
 import com.cravebite.backend_2.repository.RestaurantOwnerRepository;
-import com.cravebite.backend_2.service.RestaurantOnwerService;
+import com.cravebite.backend_2.service.RestaurantOwnerService;
 import com.cravebite.backend_2.service.UserService;
 
 import jakarta.persistence.EntityNotFoundException;
 
-public class RestaurantOnwerServiceImpl implements RestaurantOnwerService {
+@Service
+public class RestaurantOwnerServiceImpl implements RestaurantOwnerService {
 
     @Autowired
     private RestaurantOwnerRepository restaurantOwnerRepository;

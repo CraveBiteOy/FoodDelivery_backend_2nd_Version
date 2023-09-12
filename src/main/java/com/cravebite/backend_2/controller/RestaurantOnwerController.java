@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cravebite.backend_2.models.entities.RestaurantOwner;
 import com.cravebite.backend_2.models.mappers.RestaurantOwnerMapper;
 import com.cravebite.backend_2.models.response.RestaurantOwnerResponseDTO;
-import com.cravebite.backend_2.service.RestaurantOnwerService;
+import com.cravebite.backend_2.service.RestaurantOwnerService;
 
 @RestController
 @RequestMapping("/restaurant-owner")
 public class RestaurantOnwerController {
 
     @Autowired
-    private RestaurantOnwerService restaurantOnwerService;
+    private RestaurantOwnerService restaurantOnwerService;
 
     @Autowired
     private RestaurantOwnerMapper restaurantOwnerMapper;

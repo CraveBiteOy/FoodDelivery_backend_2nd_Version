@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.cravebite.backend_2.models.entities.RestaurantOwner;
 
-public interface RestaurantOnwerService {
+public interface RestaurantOwnerService {
 
     public RestaurantOwner getRestaurantOwnerById(Long restaurantOwnerId);
 
