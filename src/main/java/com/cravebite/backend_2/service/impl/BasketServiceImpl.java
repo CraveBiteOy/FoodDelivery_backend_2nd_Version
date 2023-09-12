@@ -1,6 +1,5 @@
 package com.cravebite.backend_2.service.impl;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,17 +66,17 @@ public class BasketServiceImpl implements BasketService {
         Customer customer = customerService.getCustomerById(customerId);
         Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
         Optional<Basket> basket = getBasket(customer, restaurant);
-        if (basket.isPresent()) {
-            return basket.get();
 
-        } else {
+        return basket.orElseGet(() -> {
             Basket newBasket = new Basket();
             newBasket.setCustomer(customer);
             newBasket.setRestaurant(restaurant);
+            newBasket.setTotalPrice(0.0);
             basketRepository.save(newBasket);
             return newBasket;
 
-        }
+            // }
+        });
     }
 
     // create basket from authenticated user
@@ -87,17 +86,16 @@ public class BasketServiceImpl implements BasketService {
         Customer customer = customerService.getCustomerByUserId(authenticatedUser.getId());
         Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
         Optional<Basket> basket = getBasket(customer, restaurant);
-        if (basket.isPresent()) {
-            return basket.get();
 
-        } else {
+        return basket.orElseGet(() -> {
             Basket newBasket = new Basket();
             newBasket.setCustomer(customer);
             newBasket.setRestaurant(restaurant);
+            newBasket.setTotalPrice(0.0);
             basketRepository.save(newBasket);
             return newBasket;
 
-        }
+        });
     }
 
     // helper method
@@ -113,6 +111,9 @@ public class BasketServiceImpl implements BasketService {
         if (!basketRepository.existsById(basketId) || !menuItemRepository.existsById(menuItemId)) {
             throw new EntityNotFoundException("Basket or MenuItem not found");
         }
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than zero");
+        }
 
         Basket basket = getBasketById(basketId);
         MenuItem menuItem = menuItemService.getMenuItemById(menuItemId);
@@ -120,7 +121,6 @@ public class BasketServiceImpl implements BasketService {
         BasketItem basketItem = null;
 
         try {
-            // Try to find existing basket item
             basketItem = basketItemService.getBasketItemByBasketIdAndMenuItemId(basketId, menuItemId);
             basketItem.setQuantity(basketItem.getQuantity() + quantity);
         } catch (EntityNotFoundException e) {
@@ -132,25 +132,19 @@ public class BasketServiceImpl implements BasketService {
         }
 
         basketItemService.save(basketItem);
-        updateTotalPrice(basket);
+        double itemTotalPrice = basketItem.getQuantity() * basketItem.getMenuItem().getPrice();
+        basket.setTotalPrice(basket.getTotalPrice() + itemTotalPrice);
+        basketRepository.save(basket);
 
         return basketItem;
     }
 
-    // update total price of the basket
-    private void updateTotalPrice(Basket basket) {
-        List<BasketItem> basketItems = basketItemService.getBasketItemsByBasketId(basket.getId());
-        double totalPrice = 0;
-        totalPrice = basketItems.stream()
-                .mapToDouble(basketItem -> basketItem.getQuantity() * basketItem.getMenuItem().getPrice())
-                .sum();
-        basket.setTotalPrice(totalPrice);
-        basketRepository.save(basket);
-
-    }
-
     // update quantity of an already existing (added) item in basket
     public BasketItem updateMenuItemInBasket(Long basketItemId, int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than zero");
+        }
+
         BasketItem basketItem = basketItemRepository.findById(basketItemId)
                 .orElseThrow(() -> new EntityNotFoundException("Basket item not found"));
 
@@ -161,18 +155,27 @@ public class BasketServiceImpl implements BasketService {
 
         if (existingBasketItem.isPresent()) {
             BasketItem existingItem = existingBasketItem.get();
+
+            // Calculate the old total price for this item
+            double oldItemTotalPrice = existingItem.getQuantity() * existingItem.getMenuItem().getPrice();
+
             if (quantity > 0) {
-                // Update quantity
                 existingItem.setQuantity(quantity);
+
+                // Calculate the new total price
+                double newItemTotalPrice = existingItem.getQuantity() * existingItem.getMenuItem().getPrice();
+
+                // Update the total price of the basket
+                basket.setTotalPrice(basket.getTotalPrice() - oldItemTotalPrice + newItemTotalPrice);
+
                 basketItemRepository.save(existingItem);
             } else {
-                // Remove item from basket
                 basket.getBasketItems().remove(existingItem);
-                basketRepository.save(basket);
+                basket.setTotalPrice(basket.getTotalPrice() - oldItemTotalPrice);
                 basketItemRepository.delete(existingItem);
             }
-            // Update total price of the basket
-            updateTotalPrice(basket);
+
+            basketRepository.save(basket);
             return existingItem;
         } else {
             throw new EntityNotFoundException("Menu item not found in basket");
@@ -188,7 +191,9 @@ public class BasketServiceImpl implements BasketService {
         basketRepository.save(basket);
         basketItemRepository.delete(basketItem);
         // update total price of the basket
-        updateTotalPrice(basket);
+        double itemTotalPrice = basketItem.getQuantity() * basketItem.getMenuItem().getPrice();
+        basket.setTotalPrice(basket.getTotalPrice() - itemTotalPrice);
+        basketRepository.save(basket);
     }
 
 }

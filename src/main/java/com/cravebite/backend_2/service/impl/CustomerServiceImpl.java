@@ -3,13 +3,11 @@ package com.cravebite.backend_2.service.impl;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.cravebite.backend_2.models.entities.Customer;
 import com.cravebite.backend_2.models.entities.User;
 import com.cravebite.backend_2.repository.CustomerRepository;
-import com.cravebite.backend_2.repository.UserRepository;
 import com.cravebite.backend_2.service.CustomerService;
 import com.cravebite.backend_2.service.UserService;
 
@@ -23,9 +21,6 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     private CustomerRepository customerRepository;
-
-    @Autowired
-    private UserRepository userRepository;
 
     // get customer by id
     public Customer getCustomerById(Long customerId) {
@@ -47,15 +42,13 @@ public class CustomerServiceImpl implements CustomerService {
         Optional<Customer> existingCustomer = customerRepository.findById(userId);
         if (existingCustomer.isPresent()) {
             return existingCustomer.get();
+        } else {
+            Customer newCustomer = new Customer();
+            newCustomer.setUser(authenticatedUser);
+
+            return customerRepository.save(newCustomer);
         }
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        Customer newCustomer = new Customer();
-        newCustomer.setUser(user);
-
-        return customerRepository.save(newCustomer);
     }
 
 }
