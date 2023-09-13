@@ -1,15 +1,22 @@
 package com.cravebite.backend_2.data;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Component;
 import com.cravebite.backend_2.models.entities.MenuItem;
 import com.cravebite.backend_2.models.entities.Restaurant;
 import com.cravebite.backend_2.models.entities.RestaurantOwner;
+import com.cravebite.backend_2.models.entities.SpatialEntity;
 import com.cravebite.backend_2.models.entities.User;
 import com.cravebite.backend_2.repository.MenuItemRepository;
 import com.cravebite.backend_2.repository.RestaurantOwnerRepository;
 import com.cravebite.backend_2.repository.RestaurantRepository;
+import com.cravebite.backend_2.repository.SpatialEntityRepository;
 import com.cravebite.backend_2.repository.UserRepository;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +34,9 @@ public class DataGenerator {
 
         @Autowired
         private UserRepository userRepository;
+
+        @Autowired
+        private SpatialEntityRepository spatialEntityRepository;
 
         @Transactional
         public void generateData() {
@@ -103,6 +113,28 @@ public class DataGenerator {
                                 restaurant2);
                 menuItemRepository.save(menuItem3);
 
+                /*
+                 * 
+                 * 
+                 * 
+                 */
+
+                SpatialEntity spatialEntity = new SpatialEntity();
+                spatialEntity.setName("Test Entity");
+
+                // Create a GeometryFactory
+                GeometryFactory geometryFactory = new GeometryFactory();
+
+                // Create a Coordinate
+                Coordinate coordinate = new Coordinate(60.1756, 24.9342);
+
+                // Create a Point using the GeometryFactory and Coordinate
+                org.locationtech.jts.geom.Point point = geometryFactory.createPoint(coordinate);
+
+                spatialEntity.setLocation(point);
+
+                spatialEntityRepository.save(spatialEntity);
+
         }
 
         private User createUser(String username, String password) {
@@ -135,4 +167,5 @@ public class DataGenerator {
                 menuItem.setRestaurant(restaurant);
                 return menuItem;
         }
+
 }

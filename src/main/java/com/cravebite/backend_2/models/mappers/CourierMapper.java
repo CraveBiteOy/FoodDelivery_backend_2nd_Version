@@ -9,7 +9,8 @@ import com.cravebite.backend_2.models.response.CourierResponseDTO;
 @Mapper(componentModel = "spring")
 public interface CourierMapper {
 
-    @Mapping(source = "user.id", target = "id")
+    @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "id", target = "courierId")
     @Mapping(source = "locationId", target = "locationId")
     CourierResponseDTO toCourierResponseDTO(Courier courier);
 }

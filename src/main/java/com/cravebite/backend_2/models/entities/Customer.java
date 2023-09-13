@@ -25,8 +25,6 @@ public class Customer {
     @Column(name = "id")
     private Long id;
 
-    // private Double longitude;
-    // private Double latitude;
     @Column(name = "location_id")
     private Long locationId;
 

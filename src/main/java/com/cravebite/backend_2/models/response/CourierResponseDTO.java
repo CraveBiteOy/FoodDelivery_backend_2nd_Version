@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CourierResponseDTO {
-    private Long id;
+    private Long userId;
+    private Long courierId;
     private Long locationId;
     private String status;
     private Boolean availability;
