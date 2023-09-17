@@ -2,13 +2,16 @@ package com.cravebite.backend_2.service.impl;
 
 import java.util.Optional;
 
+import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cravebite.backend_2.models.entities.Customer;
+import com.cravebite.backend_2.models.entities.Location;
 import com.cravebite.backend_2.models.entities.User;
 import com.cravebite.backend_2.repository.CustomerRepository;
 import com.cravebite.backend_2.service.CustomerService;
+import com.cravebite.backend_2.service.LocationService;
 import com.cravebite.backend_2.service.UserService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -21,6 +24,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private LocationService locationService;
 
     // get customer by id
     public Customer getCustomerById(Long customerId) {
@@ -35,7 +41,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     // create customer from authenticated user
-    public Customer createCustomerFromAuthenticatedUser() {
+    public Customer createCustomerFromAuthenticatedUser(Long locationId) {
         User authenticatedUser = userService.getAuthenticatedUser();
         Long userId = authenticatedUser.getId();
 
@@ -44,11 +50,29 @@ public class CustomerServiceImpl implements CustomerService {
             return existingCustomer.get();
         } else {
             Customer newCustomer = new Customer();
+            newCustomer.setLocationId(locationId);
             newCustomer.setUser(authenticatedUser);
 
             return customerRepository.save(newCustomer);
         }
 
+    }
+
+    public Customer getCustomerFromAuthenticatedUser() {
+        User authenticatedUser = userService.getAuthenticatedUser();
+        Long userId = authenticatedUser.getId();
+
+        return customerRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+    }
+
+    // update location
+    public Customer updateCustomerLocation(Long customerId, Point newLocation) {
+        // Customer authCourier = createCustomerFromAuthenticatedUser();
+        Customer authCourier = getCustomerFromAuthenticatedUser();
+        Location updatedLocation = locationService.updateLocation(authCourier.getLocationId(), newLocation);
+        authCourier.setLocationId(updatedLocation.getId());
+        return customerRepository.save(authCourier);
     }
 
 }

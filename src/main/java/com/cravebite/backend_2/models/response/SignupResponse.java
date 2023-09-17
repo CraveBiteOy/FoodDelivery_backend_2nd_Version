@@ -8,5 +8,6 @@ import lombok.Data;
 public class SignupResponse {
 
     private String message;
+    private Long locaLongId;
 
 }

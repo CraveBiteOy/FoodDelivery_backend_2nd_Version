@@ -1,13 +1,18 @@
 package com.cravebite.backend_2.service;
 
+import org.locationtech.jts.geom.Point;
+
 import com.cravebite.backend_2.models.entities.Customer;
 
 public interface CustomerService {
 
-    public Customer getCustomerById(Long customerId);
+    Customer getCustomerById(Long customerId);
 
-    public Customer createCustomerFromAuthenticatedUser();
+    Customer createCustomerFromAuthenticatedUser(Long locationId);
 
-    public Customer getCustomerByUserId(Long userId);
+    Customer getCustomerFromAuthenticatedUser();
 
+    Customer getCustomerByUserId(Long userId);
+
+    Customer updateCustomerLocation(Long customerId, Point newLocation);
 }

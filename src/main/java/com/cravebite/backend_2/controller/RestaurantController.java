@@ -22,57 +22,68 @@ import com.cravebite.backend_2.service.RestaurantService;
 @RequestMapping("/restaurant")
 public class RestaurantController {
 
-    @Autowired
-    private RestaurantService restaurantService;
+        @Autowired
+        private RestaurantService restaurantService;
 
-    @Autowired
-    RestaurantMapper restaurantMapper;
+        @Autowired
+        RestaurantMapper restaurantMapper;
 
-    @GetMapping("/byId/{restaurantId}")
-    public ResponseEntity<RestaurantResponseDTO> getRestaurantById(@PathVariable Long restaurantId) {
-        return ResponseEntity
-                .ok(restaurantMapper.toRestaurantResponseDTO(restaurantService
-                        .getRestaurantById(restaurantId)));
-    }
+        @GetMapping("/byId/{restaurantId}")
+        public ResponseEntity<RestaurantResponseDTO> getRestaurantById(@PathVariable Long restaurantId) {
+                return ResponseEntity
+                                .ok(restaurantMapper.toRestaurantResponseDTO(restaurantService
+                                                .getRestaurantById(restaurantId)));
+        }
 
-    @GetMapping("byName/{restaurantName}")
-    private ResponseEntity<RestaurantResponseDTO> getRestaurantByName(@PathVariable String restaurantName) {
-        return ResponseEntity
-                .ok(restaurantMapper.toRestaurantResponseDTO(restaurantService
-                        .getRestaurantByName(restaurantName)));
+        @GetMapping("byName/{restaurantName}")
+        private ResponseEntity<RestaurantResponseDTO> getRestaurantByName(@PathVariable String restaurantName) {
+                return ResponseEntity
+                                .ok(restaurantMapper.toRestaurantResponseDTO(restaurantService
+                                                .getRestaurantByName(restaurantName)));
 
-    }
+        }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<RestaurantResponseDTO>> getAllRestaurants() {
-        List<Restaurant> restaurants = restaurantService.getAllRestaurants();
-        List<RestaurantResponseDTO> response = restaurants.stream()
-                .map(restaurant -> restaurantMapper.toRestaurantResponseDTO(restaurant))
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
-    }
+        @GetMapping("/all")
+        public ResponseEntity<List<RestaurantResponseDTO>> getAllRestaurants() {
+                List<Restaurant> restaurants = restaurantService.getAllRestaurants();
+                List<RestaurantResponseDTO> response = restaurants.stream()
+                                .map(restaurant -> restaurantMapper.toRestaurantResponseDTO(restaurant))
+                                .collect(Collectors.toList());
+                return ResponseEntity.ok(response);
+        }
 
-    public ResponseEntity<List<RestaurantResponseDTO>> getAllRestaurantsByRestaurantOwner(
-            @PathVariable Long restaurantOwnerId) {
-        List<Restaurant> restaurants = restaurantService.getAllRestaurantsByRestaurantOwnerId(restaurantOwnerId);
-        List<RestaurantResponseDTO> response = restaurants.stream()
-                .map(restaurant -> restaurantMapper.toRestaurantResponseDTO(restaurant))
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
-    }
+        public ResponseEntity<List<RestaurantResponseDTO>> getAllRestaurantsByRestaurantOwner(
+                        @PathVariable Long restaurantOwnerId) {
+                List<Restaurant> restaurants = restaurantService
+                                .getAllRestaurantsByRestaurantOwnerId(restaurantOwnerId);
+                List<RestaurantResponseDTO> response = restaurants.stream()
+                                .map(restaurant -> restaurantMapper.toRestaurantResponseDTO(restaurant))
+                                .collect(Collectors.toList());
+                return ResponseEntity.ok(response);
+        }
 
-    @GetMapping("/authenticatedOwner/hasAnyRestaurant")
-    public ResponseEntity<Boolean> ownerHasRestaurant() {
-        return ResponseEntity.ok(restaurantService
-                .ownerHasRestaurant());
-    }
+        @GetMapping("/authenticatedOwner/hasAnyRestaurant")
+        public ResponseEntity<Boolean> ownerHasRestaurant() {
+                return ResponseEntity.ok(restaurantService
+                                .ownerHasRestaurant());
+        }
 
-    @PostMapping("/create")
-    public ResponseEntity<RestaurantResponseDTO> createNewRestaurant(
-            @RequestBody RestaurantRequestDTO restaurantRequestDTO) {
-        return ResponseEntity
-                .ok(restaurantMapper
-                        .toRestaurantResponseDTO(restaurantService
-                                .createNewRestaurant(restaurantRequestDTO)));
-    }
+        @PostMapping("/create")
+        public ResponseEntity<RestaurantResponseDTO> createNewRestaurant(
+                        @RequestBody RestaurantRequestDTO restaurantRequestDTO) {
+                return ResponseEntity
+                                .ok(restaurantMapper
+                                                .toRestaurantResponseDTO(restaurantService
+                                                                .createNewRestaurant(restaurantRequestDTO)));
+        }
+
+        @GetMapping("/recommend")
+        public ResponseEntity<List<RestaurantResponseDTO>> recommendRestaurants() {
+                List<Restaurant> restaurants = restaurantService.recommendRestaurants();
+                List<RestaurantResponseDTO> response = restaurants.stream()
+                                .map(restaurant -> restaurantMapper.toRestaurantResponseDTO(restaurant))
+                                .collect(Collectors.toList());
+                return ResponseEntity.ok(response);
+        }
+
 }

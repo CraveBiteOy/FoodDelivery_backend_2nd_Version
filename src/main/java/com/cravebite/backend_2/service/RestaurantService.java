@@ -20,4 +20,6 @@ public interface RestaurantService {
     boolean ownerHasRestaurant();
 
     public Restaurant createNewRestaurant(RestaurantRequestDTO restaurantRequestDTO);
+
+    public List<Restaurant> recommendRestaurants();
 }

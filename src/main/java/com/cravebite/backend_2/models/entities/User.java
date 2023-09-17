@@ -29,8 +29,8 @@ public class User {
     private String firstname;
     private String surename;
 
-    private Double longitude;
-    private Double latitude;
+    // private Double longitude;
+    // private Double latitude;
 
     @JsonIgnore
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

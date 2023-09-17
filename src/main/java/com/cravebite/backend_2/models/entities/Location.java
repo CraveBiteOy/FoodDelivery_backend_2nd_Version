@@ -1,5 +1,7 @@
 package com.cravebite.backend_2.models.entities;
 
+import org.locationtech.jts.geom.Point;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,7 +23,8 @@ public class Location {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    private double latitude;
-    private double longitude;
+
+    @Column(name = "location", columnDefinition = "geometry(Point,4326)")
+    private Point geom;
 
 }

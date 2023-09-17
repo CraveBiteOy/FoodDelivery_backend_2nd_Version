@@ -2,13 +2,20 @@ package com.cravebite.backend_2.service.impl;
 
 import java.util.List;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.cravebite.backend_2.models.entities.Customer;
+import com.cravebite.backend_2.models.entities.Location;
 import com.cravebite.backend_2.models.entities.Restaurant;
 import com.cravebite.backend_2.models.entities.RestaurantOwner;
 import com.cravebite.backend_2.models.request.RestaurantRequestDTO;
 import com.cravebite.backend_2.repository.RestaurantRepository;
+import com.cravebite.backend_2.service.CustomerService;
+import com.cravebite.backend_2.service.LocationService;
 import com.cravebite.backend_2.service.RestaurantOwnerService;
 import com.cravebite.backend_2.service.RestaurantService;
 
@@ -19,6 +26,12 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Autowired
     RestaurantRepository restaurantRepository;
+
+    @Autowired
+    private CustomerService customerService;
+
+    @Autowired
+    LocationService locationService;
 
     @Autowired
     private RestaurantOwnerService restaurantOwnerService;
@@ -78,11 +91,21 @@ public class RestaurantServiceImpl implements RestaurantService {
         newRestaurant.setAddress(restaurantRequestDTO.getAddress());
         newRestaurant.setZipcode(restaurantRequestDTO.getZipcode());
         newRestaurant.setCity(restaurantRequestDTO.getCity());
-        newRestaurant.setLatitude(restaurantRequestDTO.getLatitude());
-        newRestaurant.setLongitude(restaurantRequestDTO.getLongitude());
+        Point location = new GeometryFactory()
+                .createPoint(new Coordinate(restaurantRequestDTO.getLatitude(), restaurantRequestDTO.getLongitude()));
+        newRestaurant.setRestaurantPoint(location);
+
         newRestaurant.setRestaurantOwner(restaurantOwner);
 
         return restaurantRepository.save(newRestaurant);
 
     }
+
+    // recommend restaurants
+    public List<Restaurant> recommendRestaurants() {
+        Customer customer = customerService.getCustomerFromAuthenticatedUser();
+        Location customerLocation = locationService.getLocationById(customer.getLocationId());
+        return restaurantRepository.findNearbyRestaurants(customerLocation.getGeom(), 20000); // 20km in meters
+    }
+
 }
