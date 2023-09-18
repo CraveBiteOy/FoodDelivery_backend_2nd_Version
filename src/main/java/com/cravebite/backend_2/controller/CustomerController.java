@@ -48,7 +48,7 @@ public class CustomerController {
             @PathVariable Long locationId,
             @PathVariable Double latitude,
             @PathVariable Double longitude) {
-        Point newLocation = new GeometryFactory().createPoint(new Coordinate(latitude, longitude));
+        Point newLocation = new GeometryFactory().createPoint(new Coordinate(longitude, latitude));
         Customer customer = customerService.updateCustomerLocation(locationId, newLocation);
 
         return ResponseEntity

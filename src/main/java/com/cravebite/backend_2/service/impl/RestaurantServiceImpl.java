@@ -18,6 +18,7 @@ import com.cravebite.backend_2.service.CustomerService;
 import com.cravebite.backend_2.service.LocationService;
 import com.cravebite.backend_2.service.RestaurantOwnerService;
 import com.cravebite.backend_2.service.RestaurantService;
+import com.cravebite.backend_2.utils.Geocoder;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -32,6 +33,9 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Autowired
     LocationService locationService;
+
+    @Autowired
+    private Geocoder geocoder;
 
     @Autowired
     private RestaurantOwnerService restaurantOwnerService;
@@ -85,6 +89,8 @@ public class RestaurantServiceImpl implements RestaurantService {
         if (restaurantOwner == null) {
             throw new RuntimeException("Only restaurant owners can create restaurants");
         }
+        // Geocoding
+        restaurantRequestDTO = geocoder.geoEncode(restaurantRequestDTO);
 
         Restaurant newRestaurant = new Restaurant();
         newRestaurant.setName(restaurantRequestDTO.getName());
@@ -92,13 +98,12 @@ public class RestaurantServiceImpl implements RestaurantService {
         newRestaurant.setZipcode(restaurantRequestDTO.getZipcode());
         newRestaurant.setCity(restaurantRequestDTO.getCity());
         Point location = new GeometryFactory()
-                .createPoint(new Coordinate(restaurantRequestDTO.getLatitude(), restaurantRequestDTO.getLongitude()));
+                .createPoint(new Coordinate(restaurantRequestDTO.getLongitude(), restaurantRequestDTO.getLatitude()));
         newRestaurant.setRestaurantPoint(location);
 
         newRestaurant.setRestaurantOwner(restaurantOwner);
 
         return restaurantRepository.save(newRestaurant);
-
     }
 
     // recommend restaurants

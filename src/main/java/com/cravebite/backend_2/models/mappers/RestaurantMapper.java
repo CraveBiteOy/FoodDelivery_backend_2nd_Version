@@ -9,7 +9,7 @@ import com.cravebite.backend_2.models.response.RestaurantResponseDTO;
 @Mapper(componentModel = "spring")
 public interface RestaurantMapper {
 
-    @Mapping(target = "latitude", expression = "java(restaurant.getRestaurantPoint().getX())")
-    @Mapping(target = "longitude", expression = "java(restaurant.getRestaurantPoint().getY())")
+    @Mapping(target = "latitude", expression = "java(restaurant.getRestaurantPoint().getY())")
+    @Mapping(target = "longitude", expression = "java(restaurant.getRestaurantPoint().getX())")
     RestaurantResponseDTO toRestaurantResponseDTO(Restaurant restaurant);
 }

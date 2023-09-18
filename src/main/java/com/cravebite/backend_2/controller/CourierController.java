@@ -91,7 +91,7 @@ public class CourierController {
         @PutMapping("/location/{locationId}")
         public ResponseEntity<CourierResponseDTO> updateCourierLocation(@PathVariable Long id,
                         @RequestParam double latitude, @RequestParam double longitude) {
-                Point newLocation = new GeometryFactory().createPoint(new Coordinate(latitude, longitude));
+                Point newLocation = new GeometryFactory().createPoint(new Coordinate(longitude, latitude));
                 Courier courier = courierService.updateCourierLocation(id, newLocation);
 
                 return ResponseEntity

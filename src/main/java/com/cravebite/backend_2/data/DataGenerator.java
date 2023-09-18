@@ -187,7 +187,7 @@ public class DataGenerator {
                 // restaurant.setLongitude(longitude);
                 restaurant.setRestaurantOwner(owner);
 
-                Point location = new GeometryFactory().createPoint(new Coordinate(latitude, longitude));
+                Point location = new GeometryFactory().createPoint(new Coordinate(longitude, latitude));
                 restaurant.setRestaurantPoint(location);
 
                 return restaurant;
