@@ -12,7 +12,6 @@ public class OrderResponseDTO {
     private String status;
     private Double totalPrice;
     private Double deliveryFee;
-    private Double subTotal;
     private String deliveryInstructions;
     private String pickupTime;
     private String dropoffTime;

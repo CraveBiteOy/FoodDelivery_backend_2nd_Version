@@ -97,6 +97,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         newRestaurant.setAddress(restaurantRequestDTO.getAddress());
         newRestaurant.setZipcode(restaurantRequestDTO.getZipcode());
         newRestaurant.setCity(restaurantRequestDTO.getCity());
+        newRestaurant.setCookingTime(restaurantRequestDTO.getCookingTime());
         Point location = new GeometryFactory()
                 .createPoint(new Coordinate(restaurantRequestDTO.getLongitude(), restaurantRequestDTO.getLatitude()));
         newRestaurant.setRestaurantPoint(location);
@@ -110,7 +111,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     public List<Restaurant> recommendRestaurants() {
         Customer customer = customerService.getCustomerFromAuthenticatedUser();
         Location customerLocation = locationService.getLocationById(customer.getLocationId());
-        return restaurantRepository.findNearbyRestaurants(customerLocation.getGeom(), 20000); // 20km in meters
+        return restaurantRepository.findNearbyRestaurants(customerLocation.getGeom(), 20000);
     }
 
 }

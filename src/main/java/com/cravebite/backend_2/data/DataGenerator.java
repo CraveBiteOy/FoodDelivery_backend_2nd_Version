@@ -84,63 +84,65 @@ public class DataGenerator {
 
                 // Create restaurants in Oulu
                 Restaurant restaurant1 = createRestaurant("Restaurant 1", "Oulu Center Address 1", "Postal Code 1",
-                                "Oulu", 65.0121, 25.4651, restaurantOwner1);
+                                "Oulu", 30, 65.0121, 25.4651, restaurantOwner1);
                 restaurantRepository.save(restaurant1);
 
                 Restaurant restaurant2 = createRestaurant("Restaurant 2", "Oulu Center Address 2", "Postal Code 2",
-                                "Oulu", 65.0222, 25.4752, restaurantOwner1);
+                                "Oulu", 30, 65.0222, 25.4752, restaurantOwner1);
                 restaurantRepository.save(restaurant2);
 
                 Restaurant restaurant3 = createRestaurant("Restaurant 3", "Oulu Center Address 3", "Postal Code 3",
-                                "Oulu", 65.0323, 25.4853, restaurantOwner2);
+                                "Oulu", 30, 65.0323, 25.4853, restaurantOwner2);
                 restaurantRepository.save(restaurant3);
 
                 Restaurant restaurant4 = createRestaurant("Restaurant 4", "Oulu Center Address 4", "Postal Code 4",
-                                "Oulu", 65.0424, 25.4954, restaurantOwner2);
+                                "Oulu", 30, 65.0424, 25.4954, restaurantOwner2);
                 restaurantRepository.save(restaurant4);
 
                 Restaurant restaurant5 = createRestaurant("Restaurant 5", "Oulu Center Address 5", "Postal Code 5",
-                                "Oulu", 65.0525, 25.5055, restaurantOwner2);
+                                "Oulu", 30, 65.0525, 25.5055, restaurantOwner2);
                 restaurantRepository.save(restaurant5);
 
                 Restaurant restaurant6 = createRestaurant("Restaurant 6", "Oulu Center Address 6", "Postal Code 6",
-                                "Oulu", 65.0626, 25.5156, restaurantOwner3);
+                                "Oulu", 30, 65.0626, 25.5156, restaurantOwner3);
                 restaurantRepository.save(restaurant6);
 
                 Restaurant restaurant7 = createRestaurant("Restaurant 7", "Oulu Center Address 7", "Postal Code 7",
-                                "Oulu", 65.0727, 25.5257, restaurantOwner3);
+                                "Oulu", 30, 65.0727, 25.5257, restaurantOwner3);
                 restaurantRepository.save(restaurant7);
 
                 Restaurant restaurant8 = createRestaurant("Restaurant 8", "Oulu Center Address 8", "Postal Code 8",
-                                "Oulu", 65.0828, 25.5358, restaurantOwner3);
+                                "Oulu", 30, 65.0828, 25.5358, restaurantOwner3);
                 restaurantRepository.save(restaurant8);
 
                 Restaurant restaurant9 = createRestaurant("Restaurant 9", "Oulu Center Address 9", "Postal Code 9",
-                                "Oulu", 65.0929, 25.5459, restaurantOwner4);
+                                "Oulu", 30, 65.0929, 25.5459, restaurantOwner4);
                 restaurantRepository.save(restaurant9);
 
                 Restaurant restaurant10 = createRestaurant("Restaurant 10", "Oulu Center Address 10", "Postal Code 10",
-                                "Oulu", 65.1030, 25.5560, restaurantOwner4);
+                                "Oulu", 30, 65.1030, 25.5560, restaurantOwner4);
                 restaurantRepository.save(restaurant10);
 
                 // Create restaurants outside Oulu
                 Restaurant restaurant11 = createRestaurant("Pudasjärvi Pizza", "Pudasjärvi Address", "93100",
-                                "Pudasjärvi", 65.3666, 26.9625, restaurantOwner2);
+                                "Pudasjärvi", 30, 65.3666, 26.9625, restaurantOwner2);
                 restaurantRepository.save(restaurant11);
 
-                Restaurant restaurant12 = createRestaurant("Vaala Veggie", "Vaala Address", "91710", "Vaala", 64.5585,
+                Restaurant restaurant12 = createRestaurant("Vaala Veggie", "Vaala Address", "91710", "Vaala", 30,
+                                64.5585,
                                 26.7516, restaurantOwner5);
                 restaurantRepository.save(restaurant12);
 
                 Restaurant restaurant13 = createRestaurant("Kärsämäki Kebab", "Kärsämäki Address", "86710", "Kärsämäki",
+                                30,
                                 63.9850, 25.7570, restaurantOwner5);
                 restaurantRepository.save(restaurant13);
 
-                Restaurant restaurant14 = createRestaurant("Pyhäntä Pies", "Pyhäntä Address", "93280", "Pyhäntä",
+                Restaurant restaurant14 = createRestaurant("Pyhäntä Pies", "Pyhäntä Address", "93280", "Pyhäntä", 30,
                                 64.2789, 26.0194, restaurantOwner6);
                 restaurantRepository.save(restaurant14);
 
-                Restaurant restaurant15 = createRestaurant("Paltamo Pasta", "Paltamo Address", "88300", "Paltamo",
+                Restaurant restaurant15 = createRestaurant("Paltamo Pasta", "Paltamo Address", "88300", "Paltamo", 30,
                                 64.4030, 27.7294, restaurantOwner6);
                 restaurantRepository.save(restaurant15);
 
@@ -176,15 +178,15 @@ public class DataGenerator {
                 return user;
         }
 
-        private Restaurant createRestaurant(String name, String address, String zipcode, String city, double latitude,
+        private Restaurant createRestaurant(String name, String address, String zipcode, String city,
+                        Integer cookingTime, double latitude,
                         double longitude, RestaurantOwner owner) {
                 Restaurant restaurant = new Restaurant();
                 restaurant.setName(name);
                 restaurant.setAddress(address);
                 restaurant.setZipcode(zipcode);
                 restaurant.setCity(city);
-                // restaurant.setLatitude(latitude);
-                // restaurant.setLongitude(longitude);
+                restaurant.setCookingTime(cookingTime);
                 restaurant.setRestaurantOwner(owner);
 
                 Point location = new GeometryFactory().createPoint(new Coordinate(longitude, latitude));

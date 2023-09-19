@@ -78,7 +78,7 @@ public class AuthServiceImpl implements AuthService {
         // create new location from register request
         Location location = new Location();
         GeometryFactory geometryFactory = new GeometryFactory();
-        Coordinate coordinate = new Coordinate(registerDto.getLatitude(), registerDto.getLongitude());
+        Coordinate coordinate = new Coordinate(registerDto.getLongitude(), registerDto.getLatitude());
         Point point = geometryFactory.createPoint(coordinate);
         location.setGeom(point);
         locationRepository.save(location);

@@ -23,6 +23,9 @@ public class RestaurantRequestDTO {
     @NotBlank(message = "city cannot be blank")
     private String city;
 
+    @NotBlank(message = "cookingTime cannot be blank")
+    private Integer cookingTime;
+
     @NotNull(message = "latitude cannot be null")
     private Double latitude;
 

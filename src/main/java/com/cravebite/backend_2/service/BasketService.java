@@ -9,6 +9,8 @@ public interface BasketService {
 
     public boolean existsById(Long basketId);
 
+    public boolean isBasketOwnedByAuthenticatedCustomer(Long basketId);
+
     public Basket createBasketFromCustomer(Long customerId, Long restaurantId);
 
     public Basket createBasketFromAuthenticatedUser(Long restaurantId);

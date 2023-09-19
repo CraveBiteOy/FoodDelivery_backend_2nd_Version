@@ -61,6 +61,12 @@ public class BasketServiceImpl implements BasketService {
         return basketRepository.existsById(basketId);
     }
 
+    // check if an authenticated customer owns the basket
+    public boolean isBasketOwnedByAuthenticatedCustomer(Long basketId) {
+        return getBasketById(basketId).getCustomer().getId()
+                .equals(customerService.getCustomerFromAuthenticatedUser().getId());
+    }
+
     // create basket from customer id and restaurant id
     public Basket createBasketFromCustomer(Long customerId, Long restaurantId) {
         Customer customer = customerService.getCustomerById(customerId);
@@ -82,7 +88,6 @@ public class BasketServiceImpl implements BasketService {
     // create basket from authenticated user
     public Basket createBasketFromAuthenticatedUser(Long restaurantId) {
         User authenticatedUser = userService.getAuthenticatedUser();
-        System.out.println("authenticated user id: " + authenticatedUser.getId());
         Customer customer = customerService.getCustomerByUserId(authenticatedUser.getId());
         Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
         Optional<Basket> basket = getBasket(customer, restaurant);

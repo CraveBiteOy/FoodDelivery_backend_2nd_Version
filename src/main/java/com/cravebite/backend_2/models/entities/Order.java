@@ -3,6 +3,8 @@ package com.cravebite.backend_2.models.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.locationtech.jts.geom.Point;
+
 import com.cravebite.backend_2.models.enums.OrderStatus;
 
 import jakarta.persistence.CascadeType;
@@ -47,39 +49,26 @@ public class Order {
     @Column(name = "delivery_fee")
     private Double deliveryFee;
 
-    @Min(value = 0, message = "Sub total must be greater than 0")
-    @Column(name = "sub_total")
-    private Double subTotal;
-
     @Column(name = "delivery_instructions")
     private String deliveryInstructions;
 
     @Min(value = 0, message = "pickup time must be greater than 0")
     @Column(name = "pickup_time")
-    // private String pickupTime;
     private Integer pickupTime;
 
     @Min(value = 0, message = "dropoff time must be greater than 0")
     @Column(name = "dropoff_time")
-    // private String dropoffTime;
     private Integer dropoffTime;
 
     @Min(value = 0, message = "delivery total time must be greater than 0")
     @Column(name = "delivery_total_time")
-    // private String deliveryTotalTime;
     private Integer deliveryTotalTime;
 
-    @Column(name = "courier_start_latitude")
-    private Double courierStartLatitude;
+    @Column(name = "delivery_start_point", columnDefinition = "geometry(Point,4326)")
+    private Point deliveryStartPoint;
 
-    @Column(name = "courier_start_longitude")
-    private Double courierStartLongitude;
-
-    @Column(name = "destination_latitude")
-    private Double destinationLatitude;
-
-    @Column(name = "destination_longitude")
-    private Double destinationLongitude;
+    @Column(name = "delivery_end_point", columnDefinition = "geometry(Point,4326)")
+    private Point deliveryEndPoint;
 
     @Column(name = "delivery_address")
     private String deliveryAddress;

@@ -26,10 +26,10 @@ public class OrderRequestDTO {
     @NotBlank(message = "deliveryCountry cannot be blank")
     private String deliveryInstructions;
 
-    @NotBlank(message = "destinationLatitude cannot be blank")
+    @NotNull(message = "destinationLatitude cannot be null")
     private Double destinationLatitude;
 
-    @NotBlank(message = "destinationLongitude cannot be blank")
+    @NotNull(message = "destinationLongitude cannot be null")
     private Double destinationLongitude;
 
 }

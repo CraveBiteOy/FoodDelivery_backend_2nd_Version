@@ -18,7 +18,7 @@ public class UserResponseDTO {
     private String firstname;
     private String surename;
     private List<Role> roles;
-    private Double longitude;
-    private Double latitude;
+    // private Double longitude;
+    // private Double latitude;
 
 }
