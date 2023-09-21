@@ -3,8 +3,10 @@ package com.cravebite.backend_2.service.impl;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.cravebite.backend_2.exception.CraveBiteGlobalExceptionHandler;
 import com.cravebite.backend_2.models.entities.Basket;
 import com.cravebite.backend_2.models.entities.BasketItem;
 import com.cravebite.backend_2.models.entities.Customer;
@@ -53,7 +55,7 @@ public class BasketServiceImpl implements BasketService {
     // get basket by id
     public Basket getBasketById(Long basketId) {
         return basketRepository.findById(basketId)
-                .orElseThrow(() -> new EntityNotFoundException("Basket not found"));
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Basket not found"));
     }
 
     // check if basket exists
@@ -114,10 +116,10 @@ public class BasketServiceImpl implements BasketService {
      **/
     public BasketItem addMenuItemToBasket(Long basketId, Long menuItemId, int quantity) {
         if (!basketRepository.existsById(basketId) || !menuItemRepository.existsById(menuItemId)) {
-            throw new EntityNotFoundException("Basket or MenuItem not found");
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Basket or MenuItem not found");
         }
         if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be greater than zero");
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.BAD_REQUEST, "Quantity must be greater than zero");
         }
 
         Basket basket = getBasketById(basketId);
@@ -147,11 +149,11 @@ public class BasketServiceImpl implements BasketService {
     // update quantity of an already existing (added) item in basket
     public BasketItem updateMenuItemInBasket(Long basketItemId, int quantity) {
         if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be greater than zero");
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.BAD_REQUEST, "Quantity must be greater than zero");
         }
 
         BasketItem basketItem = basketItemRepository.findById(basketItemId)
-                .orElseThrow(() -> new EntityNotFoundException("Basket item not found"));
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Basket item not found"));
 
         Basket basket = basketItem.getBasket();
         Optional<BasketItem> existingBasketItem = basket.getBasketItems().stream()
@@ -183,14 +185,14 @@ public class BasketServiceImpl implements BasketService {
             basketRepository.save(basket);
             return existingItem;
         } else {
-            throw new EntityNotFoundException("Menu item not found in basket");
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Menu item not found in basket");
         }
     }
 
     // remove menu item from basket
     public void removeMenuItemFromBasket(Long basketItemId) {
         BasketItem basketItem = basketItemRepository.findById(basketItemId)
-                .orElseThrow(() -> new EntityNotFoundException("Basket item not found"));
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Basket item not found"));
         Basket basket = basketItem.getBasket();
         basket.getBasketItems().remove(basketItem);
         basketRepository.save(basket);

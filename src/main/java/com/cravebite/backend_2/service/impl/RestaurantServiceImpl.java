@@ -6,8 +6,10 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.cravebite.backend_2.exception.CraveBiteGlobalExceptionHandler;
 import com.cravebite.backend_2.models.entities.Customer;
 import com.cravebite.backend_2.models.entities.Location;
 import com.cravebite.backend_2.models.entities.Restaurant;
@@ -19,8 +21,6 @@ import com.cravebite.backend_2.service.LocationService;
 import com.cravebite.backend_2.service.RestaurantOwnerService;
 import com.cravebite.backend_2.service.RestaurantService;
 import com.cravebite.backend_2.utils.Geocoder;
-
-import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class RestaurantServiceImpl implements RestaurantService {
@@ -43,13 +43,13 @@ public class RestaurantServiceImpl implements RestaurantService {
     // get restaurant by id
     public Restaurant getRestaurantById(Long restaurantId) {
         return restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new EntityNotFoundException("Restaurant not found"));
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Restaurant not found"));
     }
 
     // get restaurant by its name
     public Restaurant getRestaurantByName(String restaurantName) {
         return restaurantRepository.findByName(restaurantName)
-                .orElseThrow(() -> new EntityNotFoundException("Restaurant not found"));
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Restaurant not found"));
     }
 
     // get all restaurants
@@ -78,7 +78,8 @@ public class RestaurantServiceImpl implements RestaurantService {
         RestaurantOwner restaurantOwner = restaurantOwnerService.createRestaurantOwnerFromAuthenticatedUser();
 
         if (restaurantOwner == null) {
-            throw new RuntimeException("Only restaurant owners can create restaurants");
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.UNAUTHORIZED,
+                    "Only restaurant owners can create restaurants");
         }
         // Geocoding
         restaurantRequestDTO = geocoder.geoEncode(restaurantRequestDTO);

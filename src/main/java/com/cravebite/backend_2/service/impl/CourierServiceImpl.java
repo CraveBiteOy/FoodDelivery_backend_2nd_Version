@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Optional;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.cravebite.backend_2.exception.CraveBiteGlobalExceptionHandler;
 import com.cravebite.backend_2.models.entities.Courier;
 import com.cravebite.backend_2.models.entities.Location;
 import com.cravebite.backend_2.models.entities.Order;
@@ -52,13 +54,13 @@ public class CourierServiceImpl implements CourierService {
         Long userId = authenticatedUser.getId();
 
         return courierRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Courier not found"));
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Courier not found"));
     }
 
     @Override
     public Courier getCourierById(Long courierId) {
         return courierRepository.findById(courierId)
-                .orElseThrow(() -> new RuntimeException("Courier not found"));
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Courier not found"));
     }
 
     @Override
@@ -100,9 +102,6 @@ public class CourierServiceImpl implements CourierService {
     public Courier getNearestCourier(Order order) {
         // Get the restaurant's location
         Point restaurantLocation = order.getRestaurant().getRestaurantPoint();
-
-        // Get all available couriers within a certain radius (e.g., 20000 meters)
-        System.out.println("Executing findNearbyCouriers with point: " + restaurantLocation + " and radius: " + 2000);
 
         List<Courier> nearbyCouriers = courierRepository.findNearbyCouriers(restaurantLocation, 20000.0);
 

@@ -3,11 +3,12 @@ package com.cravebite.backend_2.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.cravebite.backend_2.exception.CraveBiteGlobalExceptionHandler;
 import com.cravebite.backend_2.models.entities.User;
 import com.cravebite.backend_2.models.mappers.UserMapper;
 import com.cravebite.backend_2.repository.UserRepository;
@@ -27,7 +28,7 @@ public class UserServiceImpl implements UserService {
     public User getUserbyId(Long userId) {
 
         return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Error: User is not found."));
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, " User is not found."));
     }
 
     @Override
@@ -41,7 +42,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserbyUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND,
+                        "User not found with username: " + username));
     }
 
     // get authenticated user

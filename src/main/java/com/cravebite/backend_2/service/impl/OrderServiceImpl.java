@@ -3,8 +3,10 @@ package com.cravebite.backend_2.service.impl;
 import java.util.List;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.cravebite.backend_2.exception.CraveBiteGlobalExceptionHandler;
 import com.cravebite.backend_2.models.entities.Basket;
 import com.cravebite.backend_2.models.entities.BasketItem;
 import com.cravebite.backend_2.models.entities.Courier;
@@ -141,7 +143,7 @@ public class OrderServiceImpl implements OrderService {
          */
         Long basketId = orderRequest.getBasketId();
         if (!basketService.isBasketOwnedByAuthenticatedCustomer(basketId)) {
-            throw new RuntimeException("You don't own this basket!");
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.UNAUTHORIZED, "You don't own this basket!");
         }
 
         /* Get customer's location */
@@ -202,7 +204,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Order getOrderById(Long id) {
         return orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found!"));
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Order not found!"));
     }
 
     @Override
@@ -219,7 +221,7 @@ public class OrderServiceImpl implements OrderService {
     public Order getbyAuthenticatedRestaurantOwner(Long orderId) {
         Long restaurantOwnerId = restaurantOwnerService.getRestaurantOwnerFromAuthenticatedUser().getId();
         return orderRepository.findByIdAndRestaurant_RestaurantOwner_Id(orderId, restaurantOwnerId)
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND,
                         "Order not found for orderId: " + orderId + ", restaurantOwnerId: " + restaurantOwnerId));
 
     }
@@ -227,10 +229,10 @@ public class OrderServiceImpl implements OrderService {
     // overloaded methods
     public Order validateAndRetrieveOrder(Long orderId, RestaurantOwner onwer) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Order not found"));
 
         if (!order.getRestaurant().getRestaurantOwner().getId().equals(onwer.getId())) {
-            throw new RuntimeException("Not authorized to accept this order");
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.UNAUTHORIZED, "Not authorized to accept this order");
 
         }
         return order;
@@ -238,10 +240,10 @@ public class OrderServiceImpl implements OrderService {
 
     public Order validateAndRetrieveOrder(Long orderId, Courier courier) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Order not found"));
 
         if (!order.getCourier().getId().equals(courier.getId())) {
-            throw new RuntimeException("Not authorized");
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.UNAUTHORIZED, "Not authorized");
 
         }
         return order;
@@ -250,7 +252,8 @@ public class OrderServiceImpl implements OrderService {
     // checking pre-conditions
     public void validateOrderStatus(Order order, OrderStatus... expectedStatuses) {
         if (Arrays.stream(expectedStatuses).noneMatch(status -> status == order.getStatus())) {
-            throw new RuntimeException("Invalid order status. Expected: " + Arrays.toString(expectedStatuses));
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.BAD_REQUEST,
+                    "Invalid order status. Expected: " + Arrays.toString(expectedStatuses));
         }
     }
 
@@ -290,7 +293,7 @@ public class OrderServiceImpl implements OrderService {
 
     public Order assignOrderToCourier(Long orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Order not found"));
 
         // Assign the nearest courier to the order
         Courier courier = courierService.getNearestCourier(order);
@@ -344,7 +347,8 @@ public class OrderServiceImpl implements OrderService {
 
         // Check if the courier is near the restaurant
         if (!courierService.isCourierNearLocation(courier, order.getRestaurant().getRestaurantPoint())) {
-            throw new RuntimeException("Courier is not near the restaurant");
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.PRECONDITION_FAILED,
+                    "Courier is not near the restaurant");
         }
 
         // Mark the order as picked up
@@ -360,7 +364,8 @@ public class OrderServiceImpl implements OrderService {
 
         // Check if the courier is near the customer
         if (!courierService.isCourierNearLocation(courier, order.getDeliveryEndPoint())) {
-            throw new RuntimeException("Courier is not near the customer");
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.PRECONDITION_FAILED,
+                    "Courier is not near the customer");
         }
 
         // Mark the order as delivered

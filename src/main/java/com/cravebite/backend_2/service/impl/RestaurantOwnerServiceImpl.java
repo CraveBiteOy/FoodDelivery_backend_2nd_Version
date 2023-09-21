@@ -4,15 +4,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.cravebite.backend_2.exception.CraveBiteGlobalExceptionHandler;
 import com.cravebite.backend_2.models.entities.RestaurantOwner;
 import com.cravebite.backend_2.models.entities.User;
 import com.cravebite.backend_2.repository.RestaurantOwnerRepository;
 import com.cravebite.backend_2.service.RestaurantOwnerService;
 import com.cravebite.backend_2.service.UserService;
-
-import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class RestaurantOwnerServiceImpl implements RestaurantOwnerService {
@@ -27,7 +27,8 @@ public class RestaurantOwnerServiceImpl implements RestaurantOwnerService {
     @Override
     public RestaurantOwner getRestaurantOwnerById(Long restaurantOwnerId) {
         return restaurantOwnerRepository.findById(restaurantOwnerId)
-                .orElseThrow(() -> new EntityNotFoundException("Restaurant Owner not found"));
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND,
+                        "Restaurant Owner not found"));
 
     }
 
@@ -59,7 +60,8 @@ public class RestaurantOwnerServiceImpl implements RestaurantOwnerService {
         Long userId = authenticatedUser.getId();
 
         return restaurantOwnerRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Restaurant Owner not found"));
+                .orElseThrow(
+                        () -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Restaurant Owner not found"));
     }
 
 }
