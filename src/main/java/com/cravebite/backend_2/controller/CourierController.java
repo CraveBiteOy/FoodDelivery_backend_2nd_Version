@@ -12,9 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.cravebite.backend_2.models.entities.Courier;
 import com.cravebite.backend_2.models.enums.CourierStatus;
 import com.cravebite.backend_2.models.enums.NavigationMode;
@@ -88,11 +86,11 @@ public class CourierController {
         }
 
         // update courier location
-        @PutMapping("/location/{locationId}")
-        public ResponseEntity<CourierResponseDTO> updateCourierLocation(@PathVariable Long id,
-                        @RequestParam double latitude, @RequestParam double longitude) {
+        @PutMapping("/location/{locationId}/lat/{latitude}/long/{longitude}")
+        public ResponseEntity<CourierResponseDTO> updateCourierLocation(@PathVariable Long locationId,
+                        @PathVariable double latitude, @PathVariable double longitude) {
                 Point newLocation = new GeometryFactory().createPoint(new Coordinate(longitude, latitude));
-                Courier courier = courierService.updateCourierLocation(id, newLocation);
+                Courier courier = courierService.updateCourierLocation(locationId, newLocation);
 
                 return ResponseEntity
                                 .ok(courierMapper

@@ -5,6 +5,7 @@ import java.util.List;
 import org.locationtech.jts.geom.Point;
 
 import com.cravebite.backend_2.models.entities.Courier;
+import com.cravebite.backend_2.models.entities.Order;
 import com.cravebite.backend_2.models.enums.CourierStatus;
 import com.cravebite.backend_2.models.enums.NavigationMode;
 
@@ -25,5 +26,9 @@ public interface CourierService {
     Courier updateCourierAvailability(Boolean availability);
 
     Courier updateCourierLocation(Long courierId, Point newLocation);
+
+    Courier getNearestCourier(Order order);
+
+    boolean isCourierNearLocation(Courier courier, Point restaurantPoint);
 
 }

@@ -62,15 +62,6 @@ public class RestaurantServiceImpl implements RestaurantService {
         return restaurantRepository.findByRestaurantOwnerId(restaurantOwnerId);
     }
 
-    public Restaurant getRestaurantByIdAndAuthenticatedCustomer(Long restaurantId, Long customerId) {
-        /*
-         * 
-         * IT SHOULD NOT DO ANYTHING!
-         * IN QUAN REPO, IT SEEMS USELESS
-         */
-        return null;
-    }
-
     // check if owner has any restaurants
     public boolean ownerHasRestaurant() {
         RestaurantOwner restaurantOwner = restaurantOwnerService.createRestaurantOwnerFromAuthenticatedUser();

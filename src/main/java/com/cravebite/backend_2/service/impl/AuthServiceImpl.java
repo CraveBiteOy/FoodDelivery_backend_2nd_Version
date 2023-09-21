@@ -15,7 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.cravebite.backend_2.exception.APIException;
+import com.cravebite.backend_2.exception.CraveBiteGlobalExceptionHandler;
 import com.cravebite.backend_2.models.entities.Location;
 import com.cravebite.backend_2.models.entities.Role;
 import com.cravebite.backend_2.models.entities.User;
@@ -72,7 +72,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public SignupResponse registerUser(RegisterRequestDTO registerDto) {
         if (userRepository.findByUsername(registerDto.getUsername()).isPresent()) {
-            throw new APIException(HttpStatus.CONFLICT, "A user with this username already exists");
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.CONFLICT, "A user with this username already exists");
         }
 
         // create new location from register request
@@ -90,7 +90,7 @@ public class AuthServiceImpl implements AuthService {
 
         // Assign default role to new user
         Role userRole = roleRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new APIException(HttpStatus.NOT_FOUND, "Role is not found."));
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Role is not found."));
         newUser.setRoles(Set.of(userRole));
 
         userRepository.save(newUser);

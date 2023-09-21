@@ -7,20 +7,26 @@ import org.springframework.stereotype.Service;
 
 import com.cravebite.backend_2.models.entities.Basket;
 import com.cravebite.backend_2.models.entities.BasketItem;
+import com.cravebite.backend_2.models.entities.Courier;
 import com.cravebite.backend_2.models.entities.Location;
 import com.cravebite.backend_2.models.entities.Customer;
 import com.cravebite.backend_2.models.entities.Order;
 import com.cravebite.backend_2.models.entities.OrderItem;
 import com.cravebite.backend_2.models.entities.Restaurant;
+import com.cravebite.backend_2.models.entities.RestaurantOwner;
 import com.cravebite.backend_2.models.enums.NavigationMode;
 import com.cravebite.backend_2.models.enums.OrderStatus;
 import com.cravebite.backend_2.models.request.OrderRequestDTO;
+import com.cravebite.backend_2.repository.CourierRepository;
 import com.cravebite.backend_2.repository.OrderRepository;
 import com.cravebite.backend_2.service.BasketService;
+import com.cravebite.backend_2.service.CourierService;
 import com.cravebite.backend_2.service.CustomerService;
 import com.cravebite.backend_2.service.LocationService;
 import com.cravebite.backend_2.service.OrderService;
+import com.cravebite.backend_2.service.RestaurantOwnerService;
 import com.cravebite.backend_2.utils.Geocoder;
+import java.util.Arrays;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -43,10 +49,19 @@ public class OrderServiceImpl implements OrderService {
     private LocationService locationService;
 
     @Autowired
+    private RestaurantOwnerService restaurantOwnerService;
+
+    @Autowired
     private Geocoder geocoder;
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private CourierRepository courierRepository;
+
+    @Autowired
+    private CourierService courierService;
 
     // calculate delivery fee
     private double calculateDeliveryFee(Point restaurantPoint, Point customerPoint, NavigationMode mode) {
@@ -198,6 +213,160 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> getbyRestaurant(Long restaurantId) {
         return orderRepository.findByRestaurantId(restaurantId);
+    }
+
+    // get order by authenticated restaurant owner associated with the order
+    public Order getbyAuthenticatedRestaurantOwner(Long orderId) {
+        Long restaurantOwnerId = restaurantOwnerService.getRestaurantOwnerFromAuthenticatedUser().getId();
+        return orderRepository.findByIdAndRestaurant_RestaurantOwner_Id(orderId, restaurantOwnerId)
+                .orElseThrow(() -> new RuntimeException(
+                        "Order not found for orderId: " + orderId + ", restaurantOwnerId: " + restaurantOwnerId));
+
+    }
+
+    // overloaded methods
+    public Order validateAndRetrieveOrder(Long orderId, RestaurantOwner onwer) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (!order.getRestaurant().getRestaurantOwner().getId().equals(onwer.getId())) {
+            throw new RuntimeException("Not authorized to accept this order");
+
+        }
+        return order;
+    }
+
+    public Order validateAndRetrieveOrder(Long orderId, Courier courier) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (!order.getCourier().getId().equals(courier.getId())) {
+            throw new RuntimeException("Not authorized");
+
+        }
+        return order;
+    }
+
+    // checking pre-conditions
+    public void validateOrderStatus(Order order, OrderStatus... expectedStatuses) {
+        if (Arrays.stream(expectedStatuses).noneMatch(status -> status == order.getStatus())) {
+            throw new RuntimeException("Invalid order status. Expected: " + Arrays.toString(expectedStatuses));
+        }
+    }
+
+    public Order acceptOrderByOwner(Long orderId) {
+        RestaurantOwner owner = restaurantOwnerService.getRestaurantOwnerFromAuthenticatedUser();
+        Order order = validateAndRetrieveOrder(orderId, owner);
+
+        validateOrderStatus(order, OrderStatus.ORDERED, OrderStatus.NO_COURIERS_AVAILABLE);
+
+        // Mark the order as preparing
+        order.setStatus(OrderStatus.PREPARING);
+
+        // Assign a courier to the order
+        assignOrderToCourier(order.getId());
+
+        return orderRepository.save(order);
+    }
+
+    public Order markOrderAsReayByRestaurantOwner(Long orderId) {
+        RestaurantOwner owner = restaurantOwnerService.getRestaurantOwnerFromAuthenticatedUser();
+        Order order = validateAndRetrieveOrder(orderId, owner);
+        validateOrderStatus(order, OrderStatus.PREPARING);
+        order.setStatus(OrderStatus.READY);
+        return orderRepository.save(order);
+    }
+
+    public Order rejectOrderByOwner(Long orderId) {
+        RestaurantOwner owner = restaurantOwnerService.getRestaurantOwnerFromAuthenticatedUser();
+        Order order = validateAndRetrieveOrder(orderId, owner);
+        validateOrderStatus(order, OrderStatus.ORDERED);
+
+        // Mark the order as rejected by the restaurant
+        order.setStatus(OrderStatus.REJECTED_BY_RESTAURANT);
+
+        return orderRepository.save(order);
+    }
+
+    public Order assignOrderToCourier(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        // Assign the nearest courier to the order
+        Courier courier = courierService.getNearestCourier(order);
+
+        // If no available couriers, set status to NO_COURIERS_AVAILABLE
+        if (courier == null) {
+            order.setStatus(OrderStatus.NO_COURIERS_AVAILABLE);
+            return orderRepository.save(order);
+        }
+
+        // Otherwise, assign the courier and keep status as READY
+        order.setCourier(courier);
+
+        // Set courier availability to false
+        courier.setAvailability(false);
+        courierRepository.save(courier);
+
+        return orderRepository.save(order);
+    }
+
+    public Order acceptOrderByCourier(Long orderId) {
+        Courier courier = courierService.getCourierFromAuthenticatedUser();
+        Order order = validateAndRetrieveOrder(orderId, courier);
+        validateOrderStatus(order, OrderStatus.READY);
+
+        // Mark the order as accepted by the courier
+        order.setStatus(OrderStatus.ACCEPTED_BY_COURIER);
+
+        return orderRepository.save(order);
+    }
+
+    public Order rejectOrderByCourier(Long orderId) {
+        Courier courier = courierService.getCourierFromAuthenticatedUser();
+        Order order = validateAndRetrieveOrder(orderId, courier);
+        validateOrderStatus(order, OrderStatus.READY);
+
+        // Set courier availability back to true
+        courier.setAvailability(true);
+        courierRepository.save(courier);
+
+        // Assign the order to a new courier
+        assignOrderToCourier(order.getId());
+
+        return orderRepository.save(order);
+    }
+
+    public Order pickupOrderByCourier(Long orderId) {
+        Courier courier = courierService.getCourierFromAuthenticatedUser();
+        Order order = validateAndRetrieveOrder(orderId, courier);
+        validateOrderStatus(order, OrderStatus.ACCEPTED_BY_COURIER);
+
+        // Check if the courier is near the restaurant
+        if (!courierService.isCourierNearLocation(courier, order.getRestaurant().getRestaurantPoint())) {
+            throw new RuntimeException("Courier is not near the restaurant");
+        }
+
+        // Mark the order as picked up
+        order.setStatus(OrderStatus.PICKED_UP);
+
+        return orderRepository.save(order);
+    }
+
+    public Order dropoffOrderByCourier(Long orderId) {
+        Courier courier = courierService.getCourierFromAuthenticatedUser();
+        Order order = validateAndRetrieveOrder(orderId, courier);
+        validateOrderStatus(order, OrderStatus.PICKED_UP);
+
+        // Check if the courier is near the customer
+        if (!courierService.isCourierNearLocation(courier, order.getDeliveryEndPoint())) {
+            throw new RuntimeException("Courier is not near the customer");
+        }
+
+        // Mark the order as delivered
+        order.setStatus(OrderStatus.DELIVERED);
+
+        return orderRepository.save(order);
     }
 
 }

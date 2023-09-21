@@ -42,7 +42,7 @@ public class RestaurantOwnerServiceImpl implements RestaurantOwnerService {
         User authenticatedUser = userService.getAuthenticatedUser();
         Long userId = authenticatedUser.getId();
 
-        Optional<RestaurantOwner> existingRestaurantOwner = restaurantOwnerRepository.findById(userId);
+        Optional<RestaurantOwner> existingRestaurantOwner = restaurantOwnerRepository.findByUserId(userId);
         if (existingRestaurantOwner.isPresent()) {
             return existingRestaurantOwner.get();
         } else {
@@ -52,6 +52,14 @@ public class RestaurantOwnerServiceImpl implements RestaurantOwnerService {
             return restaurantOwnerRepository.save(newRestaurantOwner);
         }
 
+    }
+
+    public RestaurantOwner getRestaurantOwnerFromAuthenticatedUser() {
+        User authenticatedUser = userService.getAuthenticatedUser();
+        Long userId = authenticatedUser.getId();
+
+        return restaurantOwnerRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Restaurant Owner not found"));
     }
 
 }

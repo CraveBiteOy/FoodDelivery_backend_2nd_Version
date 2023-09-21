@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.cravebite.backend_2.models.entities.Courier;
 import com.cravebite.backend_2.models.entities.Location;
+import com.cravebite.backend_2.models.entities.Order;
 import com.cravebite.backend_2.models.entities.User;
 import com.cravebite.backend_2.models.enums.CourierStatus;
 import com.cravebite.backend_2.models.enums.NavigationMode;
@@ -40,6 +41,7 @@ public class CourierServiceImpl implements CourierService {
             Courier newCourier = new Courier();
             newCourier.setUser(authenticatedUser);
             newCourier.setLocationId(locationId);
+            newCourier.setAvailability(true);
             return courierRepository.save(newCourier);
         }
 
@@ -67,7 +69,6 @@ public class CourierServiceImpl implements CourierService {
 
     @Override
     public Courier updateStatusForAuthenticatedCourier(CourierStatus status) {
-        // Courier authCourier = createCourierFromAuthenticatedUser();
         Courier authCourier = getCourierFromAuthenticatedUser();
         authCourier.setStatus(status);
         return courierRepository.save(authCourier);
@@ -76,7 +77,6 @@ public class CourierServiceImpl implements CourierService {
 
     @Override
     public Courier updateNavigationModeForAuthenticatedCourier(NavigationMode mode) {
-        // Courier authCourier = createCourierFromAuthenticatedUser();
         Courier authCourier = getCourierFromAuthenticatedUser();
         authCourier.setMode(mode);
         return courierRepository.save(authCourier);
@@ -84,7 +84,6 @@ public class CourierServiceImpl implements CourierService {
 
     @Override
     public Courier updateCourierAvailability(Boolean availability) {
-        // Courier authCourier = createCourierFromAuthenticatedUser();
         Courier authCourier = getCourierFromAuthenticatedUser();
         authCourier.setAvailability(availability);
         return courierRepository.save(authCourier);
@@ -92,10 +91,57 @@ public class CourierServiceImpl implements CourierService {
 
     // update location
     public Courier updateCourierLocation(Long courierId, Point newLocation) {
-        // Courier authCourier = createCourierFromAuthenticatedUser();
         Courier authCourier = getCourierFromAuthenticatedUser();
         Location updatedLocation = locationService.updateLocation(authCourier.getLocationId(), newLocation);
         authCourier.setLocationId(updatedLocation.getId());
         return courierRepository.save(authCourier);
     }
+
+    public Courier getNearestCourier(Order order) {
+        // Get the restaurant's location
+        Point restaurantLocation = order.getRestaurant().getRestaurantPoint();
+
+        // Get all available couriers within a certain radius (e.g., 20000 meters)
+        System.out.println("Executing findNearbyCouriers with point: " + restaurantLocation + " and radius: " + 2000);
+
+        List<Courier> nearbyCouriers = courierRepository.findNearbyCouriers(restaurantLocation, 20000.0);
+
+        Courier nearestCourier = null;
+        Double shortestDistance = Double.MAX_VALUE;
+
+        for (Courier courier : nearbyCouriers) {
+            // Skip couriers who are currently assigned an order
+            if (!courier.isAvailability()) {
+                continue;
+            }
+
+            // Get the courier's location
+            Location courierLocation = locationService.getLocationById(courier.getLocationId());
+            Point courierPoint = courierLocation.getGeom();
+
+            // Calculate the distance to the restaurant using PostGIS ST_Distance
+            Double distance = courierRepository.calculateDistance(restaurantLocation, courierPoint);
+
+            // If this courier is closer, update nearestCourier and shortestDistance
+            if (distance < shortestDistance) {
+                nearestCourier = courier;
+                shortestDistance = distance;
+            }
+        }
+
+        return nearestCourier;
+    }
+
+    public boolean isCourierNearLocation(Courier courier, Point location) {
+        // Get the courier's location
+        Location courierLocation = locationService.getLocationById(courier.getLocationId());
+        Point courierPoint = courierLocation.getGeom();
+
+        // Calculate the distance to the location using PostGIS ST_Distance
+        Double distance = courierRepository.calculateDistance(courierPoint, location);
+
+        // Check if the distance is less than the threshold
+        return distance <= 100;
+    }
+
 }

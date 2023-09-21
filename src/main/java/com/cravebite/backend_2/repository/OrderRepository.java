@@ -1,6 +1,7 @@
 package com.cravebite.backend_2.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,5 +18,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByCustomerId(Long customerId);
 
     List<Order> findByRestaurantId(Long restaurantId);
+
+    Optional<Order> findByIdAndRestaurant_RestaurantOwner_Id(Long orderId, Long restaurantOwnerId);
 
 }

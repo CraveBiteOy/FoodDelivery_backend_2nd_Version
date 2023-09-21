@@ -45,7 +45,7 @@ public class CustomerServiceImpl implements CustomerService {
         User authenticatedUser = userService.getAuthenticatedUser();
         Long userId = authenticatedUser.getId();
 
-        Optional<Customer> existingCustomer = customerRepository.findById(userId);
+        Optional<Customer> existingCustomer = customerRepository.findByUserId(userId);
         if (existingCustomer.isPresent()) {
             return existingCustomer.get();
         } else {

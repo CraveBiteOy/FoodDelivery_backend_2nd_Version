@@ -37,8 +37,8 @@ public class GlobalException extends ResponseEntityExceptionHandler {
      * Handles custom APIException.
      * Returns a structured ErrorResponse.
      */
-    @ExceptionHandler(APIException.class)
-    public ResponseEntity<ErrorResponse> handleAPIException(APIException ex) {
+    @ExceptionHandler(CraveBiteGlobalExceptionHandler.class)
+    public ResponseEntity<ErrorResponse> handleAPIException(CraveBiteGlobalExceptionHandler ex) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setStatus(ex.getStatus().value());
         errorResponse.setMessage(ex.getMessage());

@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import com.cravebite.backend_2.exception.APIException;
+import com.cravebite.backend_2.exception.CraveBiteGlobalExceptionHandler;
 import com.cravebite.backend_2.models.request.OrderRequestDTO;
 import com.cravebite.backend_2.models.request.RestaurantRequestDTO;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -54,7 +54,7 @@ public class Geocoder {
             String res = httpResponse.body();
 
             if (httpResponse.statusCode() != 200) {
-                throw new APIException(HttpStatus.INTERNAL_SERVER_ERROR,
+                throw new CraveBiteGlobalExceptionHandler(HttpStatus.INTERNAL_SERVER_ERROR,
                         "Geocoding API request failed with status code: " + httpResponse.statusCode() + ", response: "
                                 + res);
             }
@@ -96,12 +96,13 @@ public class Geocoder {
                     ((OrderRequestDTO) entity).setDestinationLongitude(longitude);
                 }
             } else {
-                throw new APIException(HttpStatus.NOT_FOUND, "Geocoding API returned no results. Response: " + res);
+                throw new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND,
+                        "Geocoding API returned no results. Response: " + res);
             }
 
         } catch (InterruptedException | IOException ex) {
             ex.printStackTrace();
-            throw new APIException(HttpStatus.INTERNAL_SERVER_ERROR,
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Error while geocoding. Exception: " + ex.getMessage());
         }
 

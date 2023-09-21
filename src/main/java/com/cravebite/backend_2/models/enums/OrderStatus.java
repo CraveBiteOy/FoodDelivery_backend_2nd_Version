@@ -10,4 +10,6 @@ public enum OrderStatus {
     REJECTED_BY_COURIER,
     PICKED_UP,
     DELIVERED,
+    NO_COURIERS_AVAILABLE
+
 }

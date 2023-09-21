@@ -10,15 +10,15 @@ import org.springframework.http.HttpStatus;
 @Setter
 @ToString
 @NoArgsConstructor
-public class APIException extends RuntimeException {
+public class CraveBiteGlobalExceptionHandler extends RuntimeException {
 
     private HttpStatus status;
 
-    public APIException(String message) {
+    public CraveBiteGlobalExceptionHandler(String message) {
         super(message);
     }
 
-    public APIException(HttpStatus status, String message) {
+    public CraveBiteGlobalExceptionHandler(HttpStatus status, String message) {
         super(message);
         this.status = status;
     }

@@ -12,4 +12,6 @@ public interface RestaurantOwnerService {
 
     public RestaurantOwner createRestaurantOwnerFromAuthenticatedUser();
 
+    public RestaurantOwner getRestaurantOwnerFromAuthenticatedUser();
+
 }

@@ -13,8 +13,6 @@ public interface RestaurantService {
 
     public List<Restaurant> getAllRestaurants();
 
-    Restaurant getRestaurantByIdAndAuthenticatedCustomer(Long restaurantId, Long customerId);
-
     public List<Restaurant> getAllRestaurantsByRestaurantOwnerId(Long restaurantOwnerId);
 
     boolean ownerHasRestaurant();

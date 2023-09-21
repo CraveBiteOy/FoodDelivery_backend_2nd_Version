@@ -18,9 +18,25 @@ public interface OrderService {
 
     List<Order> getbyRestaurant(Long restaurantId);
 
+    public Order getbyAuthenticatedRestaurantOwner(Long OrderId);
+
     // List<Order> getbyCourierAndOrderStatus(Long driverId, OrderStatus status);
 
     // List<Order> getbyRestaurantAndOrderStatus(Long restaurantId, OrderStatus
     // status);
+
+    Order acceptOrderByOwner(Long orderId);
+
+    Order markOrderAsReayByRestaurantOwner(Long orderId);
+
+    Order rejectOrderByOwner(Long orderId);
+
+    Order acceptOrderByCourier(Long orderId);
+
+    Order rejectOrderByCourier(Long orderId);
+
+    Order pickupOrderByCourier(Long orderId);
+
+    Order dropoffOrderByCourier(Long orderId);
 
 }
