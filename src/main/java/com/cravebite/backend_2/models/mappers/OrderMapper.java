@@ -6,7 +6,7 @@ import org.mapstruct.Mapping;
 import com.cravebite.backend_2.models.entities.Order;
 import com.cravebite.backend_2.models.response.OrderResponseDTO;
 
-@Mapper(componentModel = "spring", uses = { CourierMapper.class, RestaurantMapper.class })
+@Mapper(componentModel = "spring", uses = { CourierMapper.class, CustomerMapper.class, RestaurantMapper.class })
 public interface OrderMapper {
 
     @Mapping(target = "destinationLatitude", expression = "java(order.getDeliveryEndPoint().getY())")

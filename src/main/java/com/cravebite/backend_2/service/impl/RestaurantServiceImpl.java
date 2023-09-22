@@ -2,6 +2,7 @@ package com.cravebite.backend_2.service.impl;
 
 import java.util.List;
 
+import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -81,6 +82,18 @@ public class RestaurantServiceImpl implements RestaurantService {
             throw new CraveBiteGlobalExceptionHandler(HttpStatus.UNAUTHORIZED,
                     "Only restaurant owners can create restaurants");
         }
+
+        // Check if a restaurant with the same name, address, and city already exists
+        Optional<Restaurant> existingRestaurant = restaurantRepository.findByNameAndAddressAndCity(
+                restaurantRequestDTO.getName(),
+                restaurantRequestDTO.getAddress(),
+                restaurantRequestDTO.getCity());
+
+        if (existingRestaurant.isPresent()) {
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.CONFLICT,
+                    "A restaurant with this name, address, and city already exists");
+        }
+
         // Geocoding
         restaurantRequestDTO = geocoder.geoEncode(restaurantRequestDTO);
 
@@ -104,6 +117,29 @@ public class RestaurantServiceImpl implements RestaurantService {
         Customer customer = customerService.getCustomerFromAuthenticatedUser();
         Location customerLocation = locationService.getLocationById(customer.getLocationId());
         return restaurantRepository.findNearbyRestaurants(customerLocation.getGeom(), 20000);
+    }
+
+    @Override
+    public Restaurant updateRestaurant(Long id, String name, Integer cookingTime) {
+
+        RestaurantOwner authenticatedOwner = restaurantOwnerService.getRestaurantOwnerFromAuthenticatedUser();
+        if (authenticatedOwner == null) {
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.UNAUTHORIZED, "User not authenticated");
+        }
+        Restaurant existingRestaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Restaurant not found"));
+
+        if (!existingRestaurant.getRestaurantOwner().getId().equals(authenticatedOwner.getId())) {
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.FORBIDDEN, "Not authorized to update this restaurant");
+        }
+
+        if (!existingRestaurant.getName().equals(name) && restaurantRepository.findByName(name) != null) {
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.CONFLICT, "Restaurant name already exists");
+        }
+
+        existingRestaurant.setName(name);
+        existingRestaurant.setCookingTime(cookingTime);
+        return restaurantRepository.save(existingRestaurant);
     }
 
 }

@@ -7,17 +7,20 @@ import com.cravebite.backend_2.models.request.RestaurantRequestDTO;
 
 public interface RestaurantService {
 
-    public Restaurant getRestaurantById(Long restaurantId);
+    Restaurant getRestaurantById(Long restaurantId);
 
-    public Restaurant getRestaurantByName(String restaurantName);
+    Restaurant getRestaurantByName(String restaurantName);
 
-    public List<Restaurant> getAllRestaurants();
+    List<Restaurant> getAllRestaurants();
 
-    public List<Restaurant> getAllRestaurantsByRestaurantOwnerId(Long restaurantOwnerId);
+    List<Restaurant> getAllRestaurantsByRestaurantOwnerId(Long restaurantOwnerId);
 
     boolean ownerHasRestaurant();
 
-    public Restaurant createNewRestaurant(RestaurantRequestDTO restaurantRequestDTO);
+    Restaurant createNewRestaurant(RestaurantRequestDTO restaurantRequestDTO);
 
-    public List<Restaurant> recommendRestaurants();
+    List<Restaurant> recommendRestaurants();
+
+    Restaurant updateRestaurant(Long id, String name, Integer cookingTime);
+
 }

@@ -21,4 +21,6 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
     @Query(value = "SELECT * FROM restaurant WHERE ST_Distance(CAST(restaurant_point AS geography), CAST(:point AS geography)) <= :distance", nativeQuery = true)
     List<Restaurant> findNearbyRestaurants(@Param("point") Point point, @Param("distance") double distance);
 
+    Optional<Restaurant> findByNameAndAddressAndCity(String name, String address, String city);
+
 }

@@ -6,7 +6,7 @@ import org.mapstruct.Mapping;
 import com.cravebite.backend_2.models.entities.Basket;
 import com.cravebite.backend_2.models.response.BasketResponseDTO;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = { CourierMapper.class, CustomerMapper.class })
 public interface BasketMapper {
 
     @Mapping(target = "restaurant.latitude", expression = "java(restaurant.getRestaurantPoint().getY())")

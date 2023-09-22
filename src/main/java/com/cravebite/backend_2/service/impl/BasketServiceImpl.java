@@ -23,8 +23,6 @@ import com.cravebite.backend_2.service.MenuItemService;
 import com.cravebite.backend_2.service.RestaurantService;
 import com.cravebite.backend_2.service.UserService;
 
-import jakarta.persistence.EntityNotFoundException;
-
 @Service
 public class BasketServiceImpl implements BasketService {
 
@@ -125,12 +123,15 @@ public class BasketServiceImpl implements BasketService {
         Basket basket = getBasketById(basketId);
         MenuItem menuItem = menuItemService.getMenuItemById(menuItemId);
 
-        BasketItem basketItem = null;
+        Optional<BasketItem> optionalBasketItem = basketItemRepository.findByBasketIdAndMenuItemId(basketId,
+                menuItemId);
 
-        try {
-            basketItem = basketItemService.getBasketItemByBasketIdAndMenuItemId(basketId, menuItemId);
+        BasketItem basketItem;
+
+        if (optionalBasketItem.isPresent()) {
+            basketItem = optionalBasketItem.get();
             basketItem.setQuantity(basketItem.getQuantity() + quantity);
-        } catch (EntityNotFoundException e) {
+        } else {
             // If not found, create new basket item
             basketItem = new BasketItem();
             basketItem.setBasket(basket);

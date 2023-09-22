@@ -24,7 +24,7 @@ public class Location {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "location", columnDefinition = "geometry(Point,4326)")
+    @Column(name = "location_point", columnDefinition = "geometry(Point,4326)")
     private Point geom;
 
 }

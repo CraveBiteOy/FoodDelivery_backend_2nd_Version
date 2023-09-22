@@ -9,7 +9,8 @@ import com.cravebite.backend_2.models.response.CustomerResponseDTO;
 @Mapper(componentModel = "spring")
 public interface CustomerMapper {
 
-    @Mapping(source = "user.id", target = "id")
+    @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "id", target = "customerId")
     @Mapping(source = "locationId", target = "locationId")
     CustomerResponseDTO toCustomerResponseDTO(Customer customer);
 }

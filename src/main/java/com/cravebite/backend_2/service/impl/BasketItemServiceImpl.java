@@ -38,7 +38,7 @@ public class BasketItemServiceImpl implements BasketItemService {
             throw new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Basket or MenuItem not found");
         }
         return basketItemRepository.findByBasketIdAndMenuItemId(basketId, menuItemId)
-                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "BasketItem not found"));
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "BasketItem not found!"));
     }
 
     // get list of basket items by basket id

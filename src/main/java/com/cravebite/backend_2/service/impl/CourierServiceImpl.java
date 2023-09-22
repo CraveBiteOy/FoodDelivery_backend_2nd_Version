@@ -118,7 +118,7 @@ public class CourierServiceImpl implements CourierService {
             Location courierLocation = locationService.getLocationById(courier.getLocationId());
             Point courierPoint = courierLocation.getGeom();
 
-            // Calculate the distance to the restaurant using PostGIS ST_Distance
+            // Calculate the distance between courier and restaurant using PostGIS
             Double distance = courierRepository.calculateDistance(restaurantLocation, courierPoint);
 
             // If this courier is closer, update nearestCourier and shortestDistance

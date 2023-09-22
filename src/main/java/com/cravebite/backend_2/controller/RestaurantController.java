@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -84,6 +85,18 @@ public class RestaurantController {
                                 .map(restaurant -> restaurantMapper.toRestaurantResponseDTO(restaurant))
                                 .collect(Collectors.toList());
                 return ResponseEntity.ok(response);
+        }
+
+        @PutMapping("/update/{restaurantId}")
+        public ResponseEntity<RestaurantResponseDTO> updateRestaurant(
+                        @PathVariable Long restaurantId,
+                        @RequestBody RestaurantRequestDTO restaurantRequestDTO) {
+                return ResponseEntity.ok(restaurantMapper
+                                .toRestaurantResponseDTO(restaurantService
+                                                .updateRestaurant(
+                                                                restaurantId,
+                                                                restaurantRequestDTO.getName(),
+                                                                restaurantRequestDTO.getCookingTime())));
         }
 
 }
