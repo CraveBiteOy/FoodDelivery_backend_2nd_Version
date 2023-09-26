@@ -1,6 +1,7 @@
 package com.cravebite.backend_2.service.impl;
 
 import java.util.List;
+import java.util.ArrayList;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import com.cravebite.backend_2.service.BasketService;
 import com.cravebite.backend_2.service.CourierService;
 import com.cravebite.backend_2.service.CustomerService;
 import com.cravebite.backend_2.service.LocationService;
+import com.cravebite.backend_2.service.OrderItemService;
 import com.cravebite.backend_2.service.OrderService;
 import com.cravebite.backend_2.service.RestaurantOwnerService;
 import com.cravebite.backend_2.utils.Geocoder;
@@ -52,6 +54,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private RestaurantOwnerService restaurantOwnerService;
+
+    @Autowired
+    private OrderItemService orderItemService;
 
     @Autowired
     private Geocoder geocoder;
@@ -135,6 +140,10 @@ public class OrderServiceImpl implements OrderService {
          * GET BASKET
          */
         Basket basket = basketService.getBasketById(orderRequest.getBasketId());
+        if (basket.getBasketItems().isEmpty()) {
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.BAD_REQUEST,
+                    "The basket is empty. Please add items before placing an order.");
+        }
         Restaurant restaurant = basket.getRestaurant();
 
         /**
@@ -158,6 +167,8 @@ public class OrderServiceImpl implements OrderService {
 
         int dropoffTime = calculateDropoffTime(calculateDistance(restaurantPoint, customerPoint),
                 NavigationMode.CAR);
+
+        System.out.println("hajri " + calculateDistance(restaurantPoint, customerPoint));
 
         int totalDeliveryTime = calculateTotalDeliveryTime(pickupTime, dropoffTime);
 
@@ -197,6 +208,9 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setOrder(order);
             order.getOrderItems().add(orderItem);
         }
+
+        // clear basket
+        basketService.clearBasket(basket);
 
         return orderRepository.save(order);
     }
@@ -372,6 +386,54 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.DELIVERED);
 
         return orderRepository.save(order);
+    }
+
+    @Override
+    public Order reOrder(Long pastOrderId) {
+        // return null;
+
+        Order pastOrder = orderRepository.findById(pastOrderId)
+                .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Order not found"));
+
+        // check if customer is authenticated
+        Customer customer = customerService.getCustomerFromAuthenticatedUser();
+        if (!customer.getId().equals(pastOrder.getCustomer().getId())) {
+            throw new CraveBiteGlobalExceptionHandler(HttpStatus.UNAUTHORIZED, "Not authorized to re-order this order");
+        }
+
+        // create new order
+        Order newOrder = new Order();
+        newOrder.setStatus(OrderStatus.ORDERED);
+        newOrder.setTotalPrice(pastOrder.getTotalPrice());
+        newOrder.setDeliveryFee(pastOrder.getDeliveryFee());
+        newOrder.setDeliveryInstructions(pastOrder.getDeliveryInstructions());
+        newOrder.setDeliveryTotalTime(pastOrder.getDeliveryTotalTime());
+        newOrder.setPickupTime(pastOrder.getPickupTime());
+        newOrder.setDropoffTime(pastOrder.getDropoffTime());
+        newOrder.setDeliveryStartPoint(pastOrder.getDeliveryStartPoint());
+        newOrder.setDeliveryEndPoint(pastOrder.getDeliveryEndPoint());
+        newOrder.setCustomer(pastOrder.getCustomer());
+        newOrder.setRestaurant(pastOrder.getRestaurant());
+        newOrder.setDeliveryAddress(pastOrder.getDeliveryAddress());
+        newOrder.setDeliveryZipcode(pastOrder.getDeliveryZipcode());
+        newOrder.setDeliveryCity(pastOrder.getDeliveryCity());
+
+        // save new order
+        newOrder = orderRepository.save(newOrder);
+
+        List<OrderItem> PastOrderItems = orderItemService.getItemsByOrder(pastOrder);
+
+        // create new orderItems
+        for (OrderItem pastOrderItem : PastOrderItems) {
+            OrderItem newOrderItem = new OrderItem();
+            newOrderItem.setQuantity(pastOrderItem.getQuantity());
+            newOrderItem.setMenuItem(pastOrderItem.getMenuItem());
+            newOrderItem.setOrder(newOrder);
+
+            orderItemService.saveOrderItem(newOrderItem);
+        }
+
+        return newOrder;
     }
 
 }

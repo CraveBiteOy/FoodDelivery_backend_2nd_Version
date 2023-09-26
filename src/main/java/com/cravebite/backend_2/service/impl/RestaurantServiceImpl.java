@@ -133,7 +133,7 @@ public class RestaurantServiceImpl implements RestaurantService {
             throw new CraveBiteGlobalExceptionHandler(HttpStatus.FORBIDDEN, "Not authorized to update this restaurant");
         }
 
-        if (!existingRestaurant.getName().equals(name) && restaurantRepository.findByName(name) != null) {
+        if (existingRestaurant.getName().equals(name) && restaurantRepository.findByName(name) == null) {
             throw new CraveBiteGlobalExceptionHandler(HttpStatus.CONFLICT, "Restaurant name already exists");
         }
 

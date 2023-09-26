@@ -21,4 +21,6 @@ public interface BasketService {
 
     public BasketItem updateMenuItemInBasket(Long menuItemId, int quantity);
 
+    public void clearBasket(Basket basket);
+
 }

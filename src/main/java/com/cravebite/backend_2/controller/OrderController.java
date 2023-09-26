@@ -37,6 +37,15 @@ public class OrderController {
                                                                 .createAnOrder(orderRequestDTO)));
         }
 
+        // re order with past order id
+        @PostMapping("/reorder/{orderId}")
+        public ResponseEntity<OrderResponseDTO> reOrder(@PathVariable Long orderId) {
+                return ResponseEntity
+                                .ok(orderMapper
+                                                .toOrderResponseDTO(orderService
+                                                                .reOrder(orderId)));
+        }
+
         // get order by id
         @GetMapping("/{orderId}")
         public ResponseEntity<OrderResponseDTO> getOrderById(@PathVariable Long orderId) {

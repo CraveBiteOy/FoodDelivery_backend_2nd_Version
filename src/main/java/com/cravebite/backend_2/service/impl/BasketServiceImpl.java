@@ -22,6 +22,8 @@ import com.cravebite.backend_2.service.CustomerService;
 import com.cravebite.backend_2.service.MenuItemService;
 import com.cravebite.backend_2.service.RestaurantService;
 import com.cravebite.backend_2.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class BasketServiceImpl implements BasketService {
@@ -49,6 +51,8 @@ public class BasketServiceImpl implements BasketService {
 
     @Autowired
     private MenuItemService menuItemService;
+
+    private static final Logger logger = LoggerFactory.getLogger(BasketServiceImpl.class);
 
     // get basket by id
     public Basket getBasketById(Long basketId) {
@@ -202,6 +206,14 @@ public class BasketServiceImpl implements BasketService {
         double itemTotalPrice = basketItem.getQuantity() * basketItem.getMenuItem().getPrice();
         basket.setTotalPrice(basket.getTotalPrice() - itemTotalPrice);
         basketRepository.save(basket);
+    }
+
+    @Override
+    public void clearBasket(Basket basket) {
+        logger.info("Clearing basket id: " + basket.getId() + " size before " + basket.getBasketItems().size());
+        basket.getBasketItems().clear();
+        basketRepository.save(basket);
+        logger.info("Cleared basket id: " + basket.getId() + " size after " + basket.getBasketItems().size());
     }
 
 }

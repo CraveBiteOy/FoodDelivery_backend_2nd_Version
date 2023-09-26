@@ -39,4 +39,6 @@ public interface OrderService {
 
     Order dropoffOrderByCourier(Long orderId);
 
+    Order reOrder(Long pastOrderId);
+
 }
