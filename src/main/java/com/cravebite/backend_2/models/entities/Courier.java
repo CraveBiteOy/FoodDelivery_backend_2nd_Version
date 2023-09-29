@@ -31,6 +31,8 @@ public class Courier {
     private boolean availability;
     private NavigationMode mode;
 
+    private boolean firstLogin = true;
+
     @Column(name = "location_id")
     private Long locationId;
 

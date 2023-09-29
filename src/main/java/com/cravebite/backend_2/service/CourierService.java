@@ -31,4 +31,6 @@ public interface CourierService {
 
     boolean isCourierNearLocation(Courier courier, Point restaurantPoint);
 
+    boolean isCourierLoggedInForTheFirstTime();
+
 }

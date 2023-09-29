@@ -1,7 +1,6 @@
 package com.cravebite.backend_2.service.impl;
 
 import java.util.List;
-import java.util.ArrayList;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -97,4 +97,11 @@ public class CourierController {
                                                 .toCourierResponseDTO(courier));
         }
 
+        // check if courier is new to the application
+        @GetMapping("/is-new")
+        public ResponseEntity<Boolean> isCourierLoggedInForTheFirstTime() {
+                return ResponseEntity
+                                .ok(courierService.isCourierLoggedInForTheFirstTime());
+        }
+
 }

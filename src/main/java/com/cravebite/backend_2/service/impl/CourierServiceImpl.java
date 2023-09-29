@@ -44,6 +44,7 @@ public class CourierServiceImpl implements CourierService {
             newCourier.setUser(authenticatedUser);
             newCourier.setLocationId(locationId);
             newCourier.setAvailability(true);
+            newCourier.setFirstLogin(true);
             return courierRepository.save(newCourier);
         }
 
@@ -141,6 +142,21 @@ public class CourierServiceImpl implements CourierService {
 
         // Check if the distance is less than the threshold
         return distance <= 100;
+    }
+
+    /*
+     * check if courier is logged in for the first time
+     * Why? Because we need to prompt the user to select a navigation mode
+     * 
+     */
+    public boolean isCourierLoggedInForTheFirstTime() {
+        Courier authCourier = getCourierFromAuthenticatedUser();
+        boolean isFirstLogin = authCourier.isFirstLogin();
+        if (isFirstLogin) {
+            authCourier.setFirstLogin(false);
+            courierRepository.save(authCourier);
+        }
+        return isFirstLogin;
     }
 
 }
