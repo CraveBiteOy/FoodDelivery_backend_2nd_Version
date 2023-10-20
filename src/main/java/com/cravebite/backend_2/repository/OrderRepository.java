@@ -21,4 +21,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Optional<Order> findByIdAndRestaurant_RestaurantOwner_Id(Long orderId, Long restaurantOwnerId);
 
+    @Query("SELECT o FROM orders o WHERE o.courier.id = :courierId AND (o.status = 'ACCEPTED_BY_COURIER' OR o.status = 'PICKED_UP')")
+    Order findByCourierId(@Param("courierId") Long courierId);
+    
 }

@@ -11,4 +11,5 @@ public class CustomerResponseDTO {
     private Long userId;
     private Long customerId;
     private Long locationId;
+    private String firstname;
 }

@@ -8,11 +8,10 @@ public interface CustomerService {
 
     Customer getCustomerById(Long customerId);
 
-    Customer createCustomerFromAuthenticatedUser(Long locationId);
-
     Customer getCustomerFromAuthenticatedUser();
 
     Customer getCustomerByUserId(Long userId);
 
-    Customer updateCustomerLocation(Long customerId, Point newLocation);
+    Customer updateCustomerLocation(Point newLocation);
+
 }

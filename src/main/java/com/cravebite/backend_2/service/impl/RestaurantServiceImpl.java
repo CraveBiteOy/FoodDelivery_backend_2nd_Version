@@ -115,7 +115,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     // recommend restaurants
     public List<Restaurant> recommendRestaurants() {
         Customer customer = customerService.getCustomerFromAuthenticatedUser();
-        Location customerLocation = locationService.getLocationById(customer.getLocationId());
+        Location customerLocation = customer.getLocation();
         return restaurantRepository.findNearbyRestaurants(customerLocation.getGeom(), 20000);
     }
 

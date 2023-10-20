@@ -12,6 +12,7 @@ public class RestaurantResponseDTO {
     private String name;
     private String address;
     private String zipcode;
+    private Integer cookingTime;
     private String city;
     private Double latitude;
     private Double longitude;

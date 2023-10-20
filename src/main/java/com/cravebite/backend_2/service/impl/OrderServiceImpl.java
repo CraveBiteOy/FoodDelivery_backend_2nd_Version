@@ -24,7 +24,7 @@ import com.cravebite.backend_2.repository.OrderRepository;
 import com.cravebite.backend_2.service.BasketService;
 import com.cravebite.backend_2.service.CourierService;
 import com.cravebite.backend_2.service.CustomerService;
-import com.cravebite.backend_2.service.LocationService;
+// import com.cravebite.backend_2.service.LocationService;
 import com.cravebite.backend_2.service.OrderItemService;
 import com.cravebite.backend_2.service.OrderService;
 import com.cravebite.backend_2.service.RestaurantOwnerService;
@@ -48,8 +48,8 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private CustomerService customerService;
 
-    @Autowired
-    private LocationService locationService;
+    // @Autowired
+    // private LocationService locationService;
 
     @Autowired
     private RestaurantOwnerService restaurantOwnerService;
@@ -91,8 +91,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     // Calculate courier's payment for an order
-    public double calculateCourierPayment(Order order, NavigationMode mode) {
-        double distanceInKilometers = calculateDistance(order.getDeliveryStartPoint(), order.getDeliveryEndPoint());
+    public double calculateCourierPayment(Point restaurantPoint, Point customerPoint, NavigationMode mode) {
+        double distanceInKilometers = calculateDistance(restaurantPoint, customerPoint);
 
         double payment = BASE_PAY + (DISTANCE_BONUS_PER_KM * distanceInKilometers);
 
@@ -156,18 +156,22 @@ public class OrderServiceImpl implements OrderService {
 
         /* Get customer's location */
         Customer customer = customerService.getCustomerFromAuthenticatedUser();
-        Location customerLocation = locationService.getLocationById(customer.getLocationId());
+        // Location customerLocation =
+        // locationService.getLocationById(customer.getLocationId());
+        Location customerLocation = customer.getLocation();
         Point customerPoint = customerLocation.getGeom();
         Point restaurantPoint = restaurant.getRestaurantPoint();
 
         double deliveryFee = calculateDeliveryFee(restaurantPoint, customerPoint, NavigationMode.CAR);
+
+        double courierPayment = calculateCourierPayment(restaurantPoint, customerPoint, NavigationMode.CAR);
 
         int pickupTime = calculatePickupTime(restaurant.getCookingTime());
 
         int dropoffTime = calculateDropoffTime(calculateDistance(restaurantPoint, customerPoint),
                 NavigationMode.CAR);
 
-        System.out.println("hajri " + calculateDistance(restaurantPoint, customerPoint));
+        double totalDistance = calculateDistance(restaurantPoint, customerPoint);
 
         int totalDeliveryTime = calculateTotalDeliveryTime(pickupTime, dropoffTime);
 
@@ -184,13 +188,15 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
         order.setStatus(OrderStatus.ORDERED);
         order.setTotalPrice(totalPrice);
+        order.setTotalDistance(Math.round(totalDistance * 10.0) / 10.0);
         order.setDeliveryFee(deliveryFee);
+        order.setCourierPaymentAmount(courierPayment);
         order.setDeliveryInstructions(orderRequest.getDeliveryInstructions());
         order.setDeliveryTotalTime(totalDeliveryTime);
         order.setPickupTime(pickupTime);
         order.setDropoffTime(dropoffTime);
-        order.setDeliveryStartPoint(restaurantPoint);
-        order.setDeliveryEndPoint(customerPoint);
+        order.setPickUpPoint(restaurantPoint);
+        order.setDropOffPoint(customerPoint);
         order.setCustomer(customer);
         order.setRestaurant(restaurant);
         order.setDeliveryAddress(orderRequest.getDeliveryAddress());
@@ -218,6 +224,11 @@ public class OrderServiceImpl implements OrderService {
     public Order getOrderById(Long id) {
         return orderRepository.findById(id)
                 .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Order not found!"));
+    }
+
+    @Override
+    public Order getbyCourierId(Long courierId) {
+        return orderRepository.findByCourierId(courierId);
     }
 
     @Override
@@ -255,7 +266,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new CraveBiteGlobalExceptionHandler(HttpStatus.NOT_FOUND, "Order not found"));
 
-        if (!order.getCourier().getId().equals(courier.getId())) {
+        if (order.getCourier() == null || !order.getCourier().getId().equals(courier.getId())) {
             throw new CraveBiteGlobalExceptionHandler(HttpStatus.UNAUTHORIZED, "Not authorized");
 
         }
@@ -310,19 +321,21 @@ public class OrderServiceImpl implements OrderService {
 
         // Assign the nearest courier to the order
         Courier courier = courierService.getNearestCourier(order);
+        System.out.println("Fetched nearest courier: " + courier);
 
         // If no available couriers, set status to NO_COURIERS_AVAILABLE
         if (courier == null) {
             order.setStatus(OrderStatus.NO_COURIERS_AVAILABLE);
             return orderRepository.save(order);
+        } else {
+
+            // Otherwise, assign the courier and keep status as READY
+            order.setCourier(courier);
+
+            // Set courier availability to false
+            courier.setAvailability(false);
+            courierRepository.save(courier);
         }
-
-        // Otherwise, assign the courier and keep status as READY
-        order.setCourier(courier);
-
-        // Set courier availability to false
-        courier.setAvailability(false);
-        courierRepository.save(courier);
 
         return orderRepository.save(order);
     }
@@ -345,6 +358,9 @@ public class OrderServiceImpl implements OrderService {
 
         // Set courier availability back to true
         courier.setAvailability(true);
+
+        // indicating that no courier is currently attending to the order
+        order.setCourier(null);
         courierRepository.save(courier);
 
         // Assign the order to a new courier
@@ -376,7 +392,7 @@ public class OrderServiceImpl implements OrderService {
         validateOrderStatus(order, OrderStatus.PICKED_UP);
 
         // Check if the courier is near the customer
-        if (!courierService.isCourierNearLocation(courier, order.getDeliveryEndPoint())) {
+        if (!courierService.isCourierNearLocation(courier, order.getDropOffPoint())) {
             throw new CraveBiteGlobalExceptionHandler(HttpStatus.PRECONDITION_FAILED,
                     "Courier is not near the customer");
         }
@@ -409,8 +425,8 @@ public class OrderServiceImpl implements OrderService {
         newOrder.setDeliveryTotalTime(pastOrder.getDeliveryTotalTime());
         newOrder.setPickupTime(pastOrder.getPickupTime());
         newOrder.setDropoffTime(pastOrder.getDropoffTime());
-        newOrder.setDeliveryStartPoint(pastOrder.getDeliveryStartPoint());
-        newOrder.setDeliveryEndPoint(pastOrder.getDeliveryEndPoint());
+        newOrder.setPickUpPoint(pastOrder.getPickUpPoint());
+        newOrder.setDropOffPoint(pastOrder.getDropOffPoint());
         newOrder.setCustomer(pastOrder.getCustomer());
         newOrder.setRestaurant(pastOrder.getRestaurant());
         newOrder.setDeliveryAddress(pastOrder.getDeliveryAddress());
@@ -434,5 +450,12 @@ public class OrderServiceImpl implements OrderService {
 
         return newOrder;
     }
+    
+
+    @Override
+    public Order save(Order order) {
+        return orderRepository.save(order);
+    }
+
 
 }

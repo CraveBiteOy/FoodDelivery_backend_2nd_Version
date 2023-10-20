@@ -10,6 +10,6 @@ import com.cravebite.backend_2.models.response.RestaurantOwnerResponseDTO;
 public interface RestaurantOwnerMapper {
 
     @Mapping(source = "user.id", target = "id")
-    @Mapping(source = "locationId", target = "locationId")
+    @Mapping(source = "location.id", target = "locationId")
     RestaurantOwnerResponseDTO toRestaurantOwnerResponseDTO(RestaurantOwner restaurantOwner);
 }

@@ -12,3 +12,5 @@ public class OrderItemResponseDTO {
     private int quantity;
     private MenuItemResponseDTO menuItem;
 }
+
+//add order id and restaurant id to order item response dto

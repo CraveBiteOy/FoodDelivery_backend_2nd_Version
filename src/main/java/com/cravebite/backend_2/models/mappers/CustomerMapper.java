@@ -11,6 +11,7 @@ public interface CustomerMapper {
 
     @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "id", target = "customerId")
-    @Mapping(source = "locationId", target = "locationId")
+    @Mapping(source = "location.id", target = "locationId")
+    @Mapping(source = "user.firstname", target = "firstname")
     CustomerResponseDTO toCustomerResponseDTO(Customer customer);
 }

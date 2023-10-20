@@ -25,7 +25,7 @@ public interface CourierService {
 
     Courier updateCourierAvailability(Boolean availability);
 
-    Courier updateCourierLocation(Long courierId, Point newLocation);
+    // Courier updateCourierLocation(Point newLocation);
 
     Courier getNearestCourier(Order order);
 

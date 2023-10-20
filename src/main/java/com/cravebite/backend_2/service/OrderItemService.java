@@ -9,6 +9,8 @@ public interface OrderItemService {
 
     List<OrderItem> getItemsByOrder(Order order);
 
+    List<OrderItem> getOrderItemsByOrderId(Long orderId);
+
     void saveOrderItem(OrderItem newOrderItem);
 
 }

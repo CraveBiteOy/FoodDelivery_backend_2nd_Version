@@ -14,5 +14,8 @@ public class CourierResponseDTO {
     private String status;
     private Boolean availability;
     private String mode;
+    private Double latitude;
+    private Double longitude;
+    private String firstname;  
 
 }

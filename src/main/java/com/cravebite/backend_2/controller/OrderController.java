@@ -19,7 +19,7 @@ import com.cravebite.backend_2.models.response.OrderResponseDTO;
 import com.cravebite.backend_2.service.OrderService;
 
 @RestController
-@RequestMapping("/order")
+@RequestMapping("/api/orders")
 public class OrderController {
 
         @Autowired
@@ -29,7 +29,7 @@ public class OrderController {
         private OrderMapper orderMapper;
 
         // create order
-        @PostMapping("/create")
+        @PostMapping("/order/create")
         public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody OrderRequestDTO orderRequestDTO) {
                 return ResponseEntity
                                 .ok(orderMapper
@@ -38,7 +38,7 @@ public class OrderController {
         }
 
         // re order with past order id
-        @PostMapping("/reorder/{orderId}")
+        @PostMapping("/order/re-order/id/{orderId}")
         public ResponseEntity<OrderResponseDTO> reOrder(@PathVariable Long orderId) {
                 return ResponseEntity
                                 .ok(orderMapper
@@ -47,7 +47,7 @@ public class OrderController {
         }
 
         // get order by id
-        @GetMapping("/{orderId}")
+        @GetMapping("/order/byId/{orderId}")
         public ResponseEntity<OrderResponseDTO> getOrderById(@PathVariable Long orderId) {
                 return ResponseEntity
                                 .ok(orderMapper
@@ -56,7 +56,7 @@ public class OrderController {
         }
 
         // get order by id and auth onwer
-        @GetMapping("/onwerAndOrderId/{orderId}")
+        @GetMapping("/order/onwerAndOrderId/{orderId}")
         public ResponseEntity<OrderResponseDTO> getbyAuthenticatedRestaurantOwner(@PathVariable Long orderId) {
                 return ResponseEntity
                                 .ok(orderMapper
@@ -65,7 +65,7 @@ public class OrderController {
         }
 
         // get order by customer
-        @GetMapping("/customer/{customerId}")
+        @GetMapping("/order/byCustomerId/{customerId}")
         public ResponseEntity<List<OrderResponseDTO>> getbyCustomer(@PathVariable Long customerId) {
                 List<Order> orders = orderService.getbyCustomer(customerId);
                 List<OrderResponseDTO> response = orders.stream()
@@ -74,7 +74,7 @@ public class OrderController {
         }
 
         // get order by restaurant
-        @GetMapping("/restaurant/{restaurantId}")
+        @GetMapping("/order/byRestaurantId/{restaurantId}")
         public ResponseEntity<List<OrderResponseDTO>> getbyRestaurant(@PathVariable Long restaurantId) {
                 List<Order> orders = orderService.getbyRestaurant(restaurantId);
                 List<OrderResponseDTO> response = orders.stream()
@@ -84,7 +84,7 @@ public class OrderController {
         }
 
         // accept order by owner
-        @GetMapping("/owner/accept/{orderId}")
+        @GetMapping("/order/id/{orderId}/ownerAccepts")
         public ResponseEntity<OrderResponseDTO> acceptOrderByOwner(@PathVariable Long orderId) {
                 return ResponseEntity
                                 .ok(orderMapper
@@ -94,7 +94,7 @@ public class OrderController {
         }
 
         // reject order by owner
-        @GetMapping("/owner/reject/{orderId}")
+        @GetMapping("/order/id/{orderId}/ownerRejects")
         public ResponseEntity<OrderResponseDTO> rejectOrderByOwner(@PathVariable Long orderId) {
                 return ResponseEntity
                                 .ok(orderMapper
@@ -103,7 +103,7 @@ public class OrderController {
         }
 
         // mark order as reay by owner
-        @GetMapping("/owner/ready/{orderId}")
+        @GetMapping("/order/id/{orderId}/ownerMarksReady")
         public ResponseEntity<OrderResponseDTO> markOrderAsReayByRestaurantOwner(@PathVariable Long orderId) {
                 return ResponseEntity
                                 .ok(orderMapper
@@ -112,7 +112,7 @@ public class OrderController {
         }
 
         // accept order by courier
-        @GetMapping("/courier/accept/{orderId}")
+        @GetMapping("/order/id/{orderId}/courierAccepts")
         public ResponseEntity<OrderResponseDTO> acceptOrderByCourier(@PathVariable Long orderId) {
                 return ResponseEntity
                                 .ok(orderMapper
@@ -121,7 +121,7 @@ public class OrderController {
         }
 
         // reject order by courier
-        @GetMapping("/courier/reject/{orderId}")
+        @GetMapping("/order/id/{orderId}/courierRejects")
         public ResponseEntity<OrderResponseDTO> rejectOrderByCourier(@PathVariable Long orderId) {
                 return ResponseEntity
                                 .ok(orderMapper
@@ -130,7 +130,7 @@ public class OrderController {
         }
 
         // pickup order by courier
-        @GetMapping("/courier/pickup/{orderId}")
+        @GetMapping("/order/id/{orderId}/courierPicksup")
         public ResponseEntity<OrderResponseDTO> pickupOrderByCourier(@PathVariable Long orderId) {
                 return ResponseEntity
                                 .ok(orderMapper
@@ -139,7 +139,7 @@ public class OrderController {
         }
 
         // dropoff order by courier
-        @GetMapping("/courier/dropoff/{orderId}")
+        @GetMapping("/order/id/{orderId}/courierDropsoff")
         public ResponseEntity<OrderResponseDTO> dropoffOrderByCourier(@PathVariable Long orderId) {
                 return ResponseEntity
                                 .ok(orderMapper

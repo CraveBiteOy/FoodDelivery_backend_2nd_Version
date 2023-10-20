@@ -2,6 +2,7 @@ package com.cravebite.backend_2.service.impl;
 
 import java.util.Set;
 
+import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -16,14 +17,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.cravebite.backend_2.exception.CraveBiteGlobalExceptionHandler;
+import com.cravebite.backend_2.models.entities.Courier;
+import com.cravebite.backend_2.models.entities.Customer;
 import com.cravebite.backend_2.models.entities.Location;
+import com.cravebite.backend_2.models.entities.RestaurantOwner;
 import com.cravebite.backend_2.models.entities.Role;
 import com.cravebite.backend_2.models.entities.User;
 import com.cravebite.backend_2.models.request.LoginRequestDTO;
 import com.cravebite.backend_2.models.request.RegisterRequestDTO;
 import com.cravebite.backend_2.models.response.LoginResponse;
 import com.cravebite.backend_2.models.response.SignupResponse;
+import com.cravebite.backend_2.repository.CourierRepository;
+import com.cravebite.backend_2.repository.CustomerRepository;
 import com.cravebite.backend_2.repository.LocationRepository;
+import com.cravebite.backend_2.repository.RestaurantOwnerRepository;
 import com.cravebite.backend_2.repository.RoleRepository;
 import com.cravebite.backend_2.repository.UserRepository;
 import com.cravebite.backend_2.service.AuthService;
@@ -41,6 +48,14 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private CourierRepository courierRepository;
+
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    @Autowired
+    private RestaurantOwnerRepository restaurantOwnerRepository;
     @Autowired
     private LocationRepository locationRepository;
 
@@ -95,6 +110,42 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(newUser);
 
+        switch (registerDto.getUserRole().toString()) {
+            case "COURIER":
+                Optional<Courier> existingCourier = courierRepository.findByUserId(newUser.getId());
+                if (!existingCourier.isPresent()) {
+                    Courier newCourier = new Courier();
+                    newCourier.setUser(newUser);
+                    // newCourier.setLocationId(location.getId());
+                    newCourier.setLocation(location);
+                    newCourier.setAvailability(true);
+                    newCourier.setFirstLogin(true);
+                    courierRepository.save(newCourier);
+                }
+                break;
+
+            case "CUSTOMER":
+                Optional<Customer> existingCustomer = customerRepository.findByUserId(newUser.getId());
+                if (!existingCustomer.isPresent()) {
+                    Customer newCustomer = new Customer();
+                    newCustomer.setUser(newUser);
+                    // newCustomer.setLocationId(location.getId());
+                    newCustomer.setLocation(location);
+                    customerRepository.save(newCustomer);
+                }
+                break;
+
+            case "RESTAURANTOWNER":
+                Optional<RestaurantOwner> existingRestaurantOwner = restaurantOwnerRepository
+                        .findByUserId(newUser.getId());
+                if (!existingRestaurantOwner.isPresent()) {
+                    RestaurantOwner newRestaurantOwner = new RestaurantOwner();
+                    newRestaurantOwner.setUser(newUser);
+                    restaurantOwnerRepository.save(newRestaurantOwner);
+                }
+                break;
+        }
+
         return SignupResponse.builder()
                 .message("User registered successfully")
                 .locaLongId(location.getId())
@@ -103,14 +154,15 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse loginUser(LoginRequestDTO loginDto) {
+        System.out.println("start loginin: ");
         Authentication auth = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(auth);
         UserDetails userDetails = customUserDetailService.loadUserByUsername(loginDto.getUsername());
-
+        System.out.println("end login ");
         return LoginResponse.builder()
-                .accessToken(jwtUtils.generateToken(userDetails))
+                .accessToken("Bearer "+ jwtUtils.generateToken(userDetails))
                 .build();
     }
 

@@ -22,6 +22,12 @@ public class OrderItemServiceImpl implements OrderItemService {
 
     }
 
+    public List<OrderItem> getOrderItemsByOrderId(Long orderId) {
+
+        return orderItemRepository.findByOrderId(orderId);
+
+    }
+
     @Override
     public void saveOrderItem(OrderItem newOrderItem) {
 

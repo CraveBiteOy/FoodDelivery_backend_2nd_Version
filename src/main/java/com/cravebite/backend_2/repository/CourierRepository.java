@@ -17,8 +17,8 @@ public interface CourierRepository extends JpaRepository<Courier, Long> {
 
     List<Courier> findByStatusAndAvailability(CourierStatus status, boolean availability);
 
-    @Query(value = "SELECT c.* FROM courier c JOIN location l ON c.location_id = l.id WHERE ST_Distance(CAST(l.location_point AS geography), CAST(:location AS geography)) <= :radius", nativeQuery = true)
-    List<Courier> findNearbyCouriers(@Param("location") Point location, @Param("radius") Double radius);
+    @Query(value = "SELECT c.* FROM courier c JOIN location l ON c.location_id = l.id WHERE c.availability = true AND ST_Distance(CAST(l.location_point AS geography), CAST(:location AS geography)) <= :radius", nativeQuery = true)
+    List<Courier> findAvailableNearbyCouriers(@Param("location") Point location, @Param("radius") Double radius);
 
     @Query(value = "SELECT ST_Distance(CAST(:point1 AS geography), CAST(:point2 AS geography))", nativeQuery = true)
     Double calculateDistance(@Param("point1") Point point1, @Param("point2") Point point2);

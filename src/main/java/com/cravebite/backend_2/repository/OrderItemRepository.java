@@ -10,4 +10,6 @@ import com.cravebite.backend_2.models.entities.OrderItem;
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
     List<OrderItem> findByOrder(Order order);
+
+    List<OrderItem> findByOrderId(Long orderId);
 }

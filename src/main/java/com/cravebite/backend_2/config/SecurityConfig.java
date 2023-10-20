@@ -1,5 +1,8 @@
 package com.cravebite.backend_2.config;
 
+// import java.util.Arrays;
+import java.util.Collections;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.context.annotation.Bean;
@@ -16,6 +19,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.cravebite.backend_2.security.JwtAuthenticationEntryPoint;
 import com.cravebite.backend_2.security.JwtRequestFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -27,11 +33,12 @@ public class SecurityConfig {
         @Autowired
         private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-        @Bean
-        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http
                                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                                 .csrf(csrf -> csrf.disable())
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                                                 .requestMatchers("/websocket-endpoint/**").permitAll()
                                                 .requestMatchers("/auth/**").permitAll()
@@ -45,14 +52,26 @@ public class SecurityConfig {
                 return http.build();
         }
 
-        @Bean
-        public PasswordEncoder passwordEncoder() {
+    @Bean
+    PasswordEncoder passwordEncoder() {
                 return new BCryptPasswordEncoder();
         }
 
-        @Bean
-        public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
-                        throws Exception {
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
+        configuration.setAllowedMethods(Collections.singletonList("*"));
+        configuration.setAllowCredentials(false);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
                 return authenticationConfiguration.getAuthenticationManager();
         }
 

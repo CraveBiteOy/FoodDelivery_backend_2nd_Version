@@ -1,5 +1,10 @@
 package com.cravebite.backend_2.models.request;
 
+import com.cravebite.backend_2.models.enums.UserRole;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -28,4 +33,8 @@ public class RegisterRequestDTO {
 
     @NotNull(message = "latitude cannot be null")
     private double latitude;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_role")
+    private UserRole userRole;
 }

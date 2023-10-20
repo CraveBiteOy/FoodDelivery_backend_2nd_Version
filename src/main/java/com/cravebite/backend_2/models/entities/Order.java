@@ -45,9 +45,19 @@ public class Order {
     @Column(name = "total_price")
     private Double totalPrice;
 
+    @Min(value = 0, message = "Total distance must be greater than 0")
+    @Column(name = "total_distance")
+    private Double totalDistance;
+
+
     @Min(value = 0, message = "Delivery fee must be greater than 0")
     @Column(name = "delivery_fee")
     private Double deliveryFee;
+
+    @Min(value = 0, message = "Courier payment amount must be greater than 0")
+    @Column(name = "courier_payment_amount")
+    private Double courierPaymentAmount;
+
 
     @Column(name = "delivery_instructions")
     private String deliveryInstructions;
@@ -64,11 +74,15 @@ public class Order {
     @Column(name = "delivery_total_time")
     private Integer deliveryTotalTime;
 
-    @Column(name = "delivery_start_point", columnDefinition = "geometry(Point,4326)")
-    private Point deliveryStartPoint;
+    @Column(name = "pickup_point", columnDefinition = "geometry(Point,4326)")
+    private Point pickUpPoint;
 
-    @Column(name = "delivery_end_point", columnDefinition = "geometry(Point,4326)")
-    private Point deliveryEndPoint;
+    @Column(name = "dropoff_point", columnDefinition = "geometry(Point,4326)")
+    private Point DropOffPoint;
+
+    @Column(name = "courier_current_point", columnDefinition = "geometry(Point,4326)")
+    private Point courierCurrentPoint;
+
 
     @Column(name = "delivery_address")
     private String deliveryAddress;

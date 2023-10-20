@@ -29,6 +29,11 @@ public class GlobalException extends ResponseEntityExceptionHandler {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors()
                 .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+        errorResponse.setMessages(errors.toString()); 
+
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
 
     }
@@ -41,7 +46,8 @@ public class GlobalException extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAPIException(CraveBiteGlobalExceptionHandler ex) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setStatus(ex.getStatus().value());
-        errorResponse.setMessage(ex.getMessage());
+        // errorResponse.setMessage(ex.getMessage());
+        errorResponse.setMessages(ex.getMessage());
 
         return new ResponseEntity<>(errorResponse, ex.getStatus());
 
@@ -55,7 +61,8 @@ public class GlobalException extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        errorResponse.setMessage(ex.getMessage());
+        // errorResponse.setMessage(ex.getMessage());
+        errorResponse.setMessages(ex.getMessage());
 
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 

@@ -33,23 +33,13 @@ public class CustomerController {
         return new ResponseEntity<>(customerService.getCustomerById(id), HttpStatus.OK);
     }
 
-    // get customer by authenticated user
-    @GetMapping("/authenticated/location/{locationId}")
-    public ResponseEntity<CustomerResponseDTO> getCustomerByAuthenticatedUser(@PathVariable Long locationId) {
-        return new ResponseEntity<>(
-                customerMapper.toCustomerResponseDTO(customerService.createCustomerFromAuthenticatedUser(locationId)),
-                HttpStatus.OK);
-
-    }
-
-    // update courier location
-    @PutMapping("/location/{locationId}/lat/{latitude}/long/{longitude}")
+    // update customer location
+    @PutMapping("/lat/{latitude}/long/{longitude}")
     public ResponseEntity<CustomerResponseDTO> updateCourierLocation(
-            @PathVariable Long locationId,
             @PathVariable Double latitude,
             @PathVariable Double longitude) {
         Point newLocation = new GeometryFactory().createPoint(new Coordinate(longitude, latitude));
-        Customer customer = customerService.updateCustomerLocation(locationId, newLocation);
+        Customer customer = customerService.updateCustomerLocation(newLocation);
 
         return ResponseEntity
                 .ok(customerMapper
