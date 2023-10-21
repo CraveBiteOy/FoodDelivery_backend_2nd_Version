@@ -15,7 +15,7 @@ import com.cravebite.backend_2.models.response.OrderItemResponseDTO;
 import com.cravebite.backend_2.service.OrderItemService;
 
 @RestController
-@RequestMapping("/api/OrderItems")
+@RequestMapping("/api/orderItems")
 public class MenuItemController {
 
     @Autowired
@@ -25,7 +25,7 @@ public class MenuItemController {
     private OrderItemMapper orderItemMapper;
 
     // get menu items by order id
-    @GetMapping("/ByOrderId/{orderId}")
+    @GetMapping("/byOrderId/{orderId}")
     public ResponseEntity<List<OrderItemResponseDTO>> getMenuItemsByOrderId(@PathVariable Long orderId) {
         return ResponseEntity
                 .ok(orderItemService

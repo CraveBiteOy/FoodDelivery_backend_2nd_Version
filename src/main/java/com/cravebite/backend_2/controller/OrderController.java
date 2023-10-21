@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,9 @@ public class OrderController {
 
         @Autowired
         private OrderMapper orderMapper;
+
+        @Autowired
+        SimpMessagingTemplate simpMessagingTemplate;
 
         // create order
         @PostMapping("/order/create")
@@ -86,10 +90,14 @@ public class OrderController {
         // accept order by owner
         @GetMapping("/order/id/{orderId}/ownerAccepts")
         public ResponseEntity<OrderResponseDTO> acceptOrderByOwner(@PathVariable Long orderId) {
-                return ResponseEntity
-                                .ok(orderMapper
-                                                .toOrderResponseDTO(orderService
-                                                                .acceptOrderByOwner(orderId)));
+                OrderResponseDTO orderResponseDTO = orderMapper
+                                .toOrderResponseDTO(orderService.acceptOrderByOwner(orderId));
+                /*
+                 * Notify courier so they get a notification prompting them to accept the new order or reject it
+                 */
+                simpMessagingTemplate.convertAndSend("/topic/orders/courier/" + orderResponseDTO.getCourier().getCourierId(), orderResponseDTO);
+
+                return ResponseEntity.ok(orderResponseDTO);
 
         }
 
@@ -105,19 +113,29 @@ public class OrderController {
         // mark order as reay by owner
         @GetMapping("/order/id/{orderId}/ownerMarksReady")
         public ResponseEntity<OrderResponseDTO> markOrderAsReayByRestaurantOwner(@PathVariable Long orderId) {
-                return ResponseEntity
-                                .ok(orderMapper
-                                                .toOrderResponseDTO(orderService
-                                                                .markOrderAsReayByRestaurantOwner(orderId)));
+                OrderResponseDTO orderResponseDTO = orderMapper
+                                .toOrderResponseDTO(orderService.markOrderAsReayByRestaurantOwner(orderId));
+
+                /*
+                * Notify courier so they know the order is ready for pickup
+                */
+                simpMessagingTemplate.convertAndSend("/topic/orders/courier/" + orderResponseDTO.getCourier().getCourierId(), orderResponseDTO);
+
+                return ResponseEntity.ok(orderResponseDTO);
         }
 
         // accept order by courier
         @GetMapping("/order/id/{orderId}/courierAccepts")
         public ResponseEntity<OrderResponseDTO> acceptOrderByCourier(@PathVariable Long orderId) {
-                return ResponseEntity
-                                .ok(orderMapper
-                                                .toOrderResponseDTO(orderService
-                                                                .acceptOrderByCourier(orderId)));
+                OrderResponseDTO orderResponseDTO = orderMapper
+                                .toOrderResponseDTO(orderService.acceptOrderByCourier(orderId));
+                
+                /*
+                * Notify courier so they get the updated order
+                */
+                simpMessagingTemplate.convertAndSend("/topic/orders/courier/" + orderResponseDTO.getCourier().getCourierId(), orderResponseDTO);
+
+                return ResponseEntity.ok(orderResponseDTO);
         }
 
         // reject order by courier
@@ -132,19 +150,29 @@ public class OrderController {
         // pickup order by courier
         @GetMapping("/order/id/{orderId}/courierPicksup")
         public ResponseEntity<OrderResponseDTO> pickupOrderByCourier(@PathVariable Long orderId) {
-                return ResponseEntity
-                                .ok(orderMapper
-                                                .toOrderResponseDTO(orderService
-                                                                .pickupOrderByCourier(orderId)));
+                OrderResponseDTO orderResponseDTO = orderMapper
+                                .toOrderResponseDTO(orderService.pickupOrderByCourier(orderId));
+
+                /*
+                * Notify courier so they get the updated order
+                */
+                simpMessagingTemplate.convertAndSend("/topic/orders/courier/" + orderResponseDTO.getCourier().getCourierId(), orderResponseDTO);
+
+                return ResponseEntity.ok(orderResponseDTO);
         }
 
         // dropoff order by courier
         @GetMapping("/order/id/{orderId}/courierDropsoff")
         public ResponseEntity<OrderResponseDTO> dropoffOrderByCourier(@PathVariable Long orderId) {
-                return ResponseEntity
-                                .ok(orderMapper
-                                                .toOrderResponseDTO(orderService
-                                                                .dropoffOrderByCourier(orderId)));
+                OrderResponseDTO orderResponseDTO = orderMapper
+                                .toOrderResponseDTO(orderService.dropoffOrderByCourier(orderId));
+
+                /*
+                * Notify courier so they get the updated order
+                */
+                simpMessagingTemplate.convertAndSend("/topic/orders/courier/" + orderResponseDTO.getCourier().getCourierId(), orderResponseDTO);
+
+                return ResponseEntity.ok(orderResponseDTO);
 
         }
 }

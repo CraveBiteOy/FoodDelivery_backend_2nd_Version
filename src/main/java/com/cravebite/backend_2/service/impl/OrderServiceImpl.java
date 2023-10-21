@@ -299,7 +299,7 @@ public class OrderServiceImpl implements OrderService {
     public Order markOrderAsReayByRestaurantOwner(Long orderId) {
         RestaurantOwner owner = restaurantOwnerService.getRestaurantOwnerFromAuthenticatedUser();
         Order order = validateAndRetrieveOrder(orderId, owner);
-        validateOrderStatus(order, OrderStatus.PREPARING);
+        validateOrderStatus(order, OrderStatus.PREPARING, OrderStatus.ACCEPTED_BY_COURIER);
         order.setStatus(OrderStatus.READY);
         return orderRepository.save(order);
     }
@@ -343,7 +343,7 @@ public class OrderServiceImpl implements OrderService {
     public Order acceptOrderByCourier(Long orderId) {
         Courier courier = courierService.getCourierFromAuthenticatedUser();
         Order order = validateAndRetrieveOrder(orderId, courier);
-        validateOrderStatus(order, OrderStatus.READY);
+        validateOrderStatus(order, OrderStatus.PREPARING, OrderStatus.READY);
 
         // Mark the order as accepted by the courier
         order.setStatus(OrderStatus.ACCEPTED_BY_COURIER);
@@ -372,7 +372,7 @@ public class OrderServiceImpl implements OrderService {
     public Order pickupOrderByCourier(Long orderId) {
         Courier courier = courierService.getCourierFromAuthenticatedUser();
         Order order = validateAndRetrieveOrder(orderId, courier);
-        validateOrderStatus(order, OrderStatus.ACCEPTED_BY_COURIER);
+        validateOrderStatus(order, OrderStatus.READY);
 
         // Check if the courier is near the restaurant
         if (!courierService.isCourierNearLocation(courier, order.getRestaurant().getRestaurantPoint())) {
